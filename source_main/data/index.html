@@ -1,0 +1,352 @@
+<!DOCTYPE HTML> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="resources/css/style.css" type="text/css">
+    <script src="resources/js/script.js"></script>
+    <script src="resources/js/con2sv.js"></script>
+    <script src="resources/js/nwConf.js"></script>
+    <script src="resources/js/settingConf.js"></script>
+    <script src="resources/js/mpuConf.js"></script>
+    <script src="resources/js/reqMacnType.js"></script>
+    <script src="resources/js/simInfo.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- <script src="resources/js/alarm.js"></script> -->
+
+</head>
+
+<body onload="generatePage();">
+    <div class="topnav">
+        <h2>PT100 LOGGER</h2>
+        <div class="line1"></div>
+        <div class="topnav-right">
+            <li><a class="select-tab active" href="#Settings">Wifi Settings</a></li>
+            <li><a class="select-tab" href="#Data_display">Data display</a></li> 
+            <li><a class="select-tab" href="#Server_settings">Network</a></li>
+            <li><a class="select-tab" href="#Update_FW">Update Firmware</a></li>
+            <!-- <li><a class="select-tab active" href="#SIM_Info">SIM Information</a></li> -->
+            <!-- <li><a class="select-tab" href="#Alarm">Alarm Config</a></li> --> 
+        </div>
+    </div><br>
+    <!---------------------------- SETTINGS TAB ------------------------->
+        <div class="main-content  active-content">
+            <div  style="font-size: 30px; text-align:center; margin: auto;">DEVICE SETTINGS</div>
+            <br>
+            <div style="font-size: 25px; text-align:center;" class="wifi-config active-content"><b>AP MODE</b><br>
+                <table style="font-size: 20px; margin: auto;" border="0">
+                    <tr style="height: 5px;"></tr>
+                    <tr>
+                        <td></td>
+                        <td style="text-align: left; font-size: 15px;"> <i> <b> SSID:</b></i></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td align="left"><input  type="text" class="settings-tab-input-ap" ></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td style="text-align: left; font-size: 15px;"> <i><b>Password:</b></i></td>
+                    </tr>
+                    <!-- <tr>
+                        <td></td>
+                        <td align="left"><input  type="password" class="settings-tab-input-ap"></td>
+
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td style="text-align: left; font-size: 15px;"> <i><b>Confirm Password:</b></i> </td>
+                    </tr> -->
+                    <tr>
+                        <td></td>
+                        <td align="left"><input type="password" class="settings-tab-input-ap"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="font-size: 25px; text-align:center;" class="wifi-config"><b>STA MODE</b><br>
+                <table style="font-size: 20px; margin: auto;" border="0">
+                    <tr style="height: 5px;"></tr>
+                    <tr>
+                        <td></td>
+                        <td style="text-align: left; font-size: 15px;"> <i> <b> SSID:</b></i></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td align="left"><input  type="text" class="settings-tab-input-sta" ></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td style="text-align: left; font-size: 15px;"> <i><b>Password:</b></i></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td align="left"><input  type="password" class="settings-tab-input-sta"></td>
+
+                    </tr>
+                </table>
+            </div>
+            <br>
+            <div align= "center">
+                <label   class="switch">
+                    <input class="slider" type="checkbox">
+                    <span  class="slider"></span>
+                </label><br><br>
+                <button onclick="send_data_settings_config();">Submit</button> <br> <br>
+                <button onclick="reset_device();">Reset</button>
+
+            </div>
+            
+        </div>
+        <div class="main-content" >
+            <div  style="font-size: 30px; text-align:center; margin: auto;">DATA DISPLAY</div><br><br>
+            <div>
+                <div class="">
+                    <table  style="margin-left: 43.5%;" border="0" class="network-select-table">
+                        <tr style="height: 50px;">
+                            <td ><b >Temp</b></td> 
+                            <td id="temp_data"><b >TEMP</b> </td> 
+                        </tr>
+                        <tr style="height: 50px;">
+                            <td ><b >Time set: </b></td> 
+                            <td >
+                                <div class="input-wrapper">
+                                    <input type="number" placeholder="0" id="t_send_timeSend">
+                                </div>
+                            </td> 
+                        </tr>
+                        <tr>
+                        <td></td>
+                        <td>
+                            <button onclick="send_time_send();">Submit</button>
+                        </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- <div style="margin-left: auto; width: 48%; ">
+                    <table border = "0" class="protocol-select active-content" align="center" border="0"> 
+                        <tr>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td align="center"><i><b>ADD NEW DEVICE</b></i></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                        </tr>
+                        
+                        <tr>
+                            <td style="text-align: left; font-size: 15px;"> <i><b>Pair Key:</b></i></td>
+                        </tr>
+                        <tr>
+                            <td align="right"><input maxlength="6" type="number" oninput="this.value = this.value.slice(0, this.maxLength);"  class="pairkey-input" ></td>
+                            <td align="left" width = "50%"><label id="query-status"></label></td>
+                        </tr>
+                        
+                    </table>
+                    <table class="protocol-select " align="center" border="0"> 
+                        <tr>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td align="center"><i><b>CHANGE PAIR KEY</b></i></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left; font-size: 15px;"> <i><b>Pair Key:</b></i></td>
+                        </tr>
+                        <tr>
+                            <td align="right"><input  type="text" class="pairkey-input" ></td>
+                        </tr>
+                        <tr>
+
+                        </tr>
+                    </table>
+                    <br>
+                    <br>
+                </div> -->
+                <table border="0" align="center" class="machine-types-image-table images-table-none">
+                    <tr>
+                        <td><img class="machine-type-image machine-type-image-none"></img></td>
+                        <td><img class="machine-type-image machine-type-image-none"></img></td>
+                        <td><img class="machine-type-image machine-type-image-none"></img></td>
+                    </tr>
+                    <tr>
+                        <td><div class="machine-type-description machine-type-description-none active-machine-type"></div></td>
+                        <td><div class="machine-type-description machine-type-description-none"></div></td>
+                        <td><div class="machine-type-description machine-type-description-none"></div></td>
+                    </tr>
+                    <tr>
+                        <td><img class="machine-type-image machine-type-image-none"></img></td>
+                        <td><img class="machine-type-image machine-type-image-none"></img></td>
+                        <td><img class="machine-type-image machine-type-image-none"></img></td>
+                    </tr>
+                    <tr>
+                        <td><img class="machine-type-description machine-type-image-none"></img></td>
+                        <td><img class="machine-type-description machine-type-image-none"></img></td>
+                        <td><img class="machine-type-description machine-type-image-none"></img></td>
+                    </tr>
+                </table>
+                <!-- <script>
+                    // Image URL
+                    const imageUrl = "https://mozanio.citgroup.vn/storage/machine_type/machine-1731401015_5lqo.png";
+                    const imageUrl2 = "https://mozanio.citgroup.vn/storage/machine_type/machine-1731401004_oxqt.png";
+            
+                    // Create an image element
+                    const img = document.createElement("img");
+                    img.src = imageUrl;
+                    img.alt = "Machine Image";
+                    img.style.width = "100px"; // Set width
+                    img.style.height = "auto"; // Maintain aspect ratio
+                    
+                    const img2 = document.createElement("img");
+                    img2.src = imageUrl;
+                    img2.alt = "Machine Image";
+                    img2.style.width = "100px"; // Set width
+                    img2.style.height = "auto"; // Maintain aspect ratio
+                    // Append the image to a container
+                    const container = document.getElementById("image-container");
+                    container.appendChild(img);
+                    container.appendChild(img2);
+                </script> -->
+            </div><br>
+        </div>
+        <!---------------------------- NETWORK TAB ------------------------->
+        <div class="main-content">
+            <div  style="font-size: 30px; text-align:center; margin: auto;">MQTT SETUP</div>
+            <br>
+            <table align="center">
+                <tr>
+                    <td></td>
+                    <td style="text-align: left; font-size: 15px;"> <i> <b> Host:</b></i></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td align="left"><input  type="text" class="mqtt-tab-input" ></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td style="text-align: left; font-size: 15px;"> <i><b>Port:</b></i></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td align="left"><input  type="text" class="mqtt-tab-input"></td>
+
+                </tr>
+                <tr>
+                    <td></td>
+                    <td style="text-align: left; font-size: 15px;"> <i> <b> Username:</b></i></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td align="left"><input  type="text" class="mqtt-tab-input" ></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td style="text-align: left; font-size: 15px;"> <i><b>Password:</b></i></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td align="left"><input  type="text" class="mqtt-tab-input"></td>
+
+                </tr>
+            </table>
+            <div align= "center">
+                <button onclick="send_data_mqtt();">Submit</button> <br> <br>
+            </div>
+        </div>
+        <!---------------------------- FW UPDATE TAB ------------------------->
+        <div class="main-content ">
+            <div class="grid wide">
+                <div class="row no-gutters">
+                    <div class="col l-12 center">
+                            <h1 class="fw_fs_version"></h1>
+                            <h1 class="fw_fs_version">FS: 0.0.5</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col l-12">
+                        <form method="POST" action="/update" enctype="multipart/form-data">
+                                <span>Firmware Update: </span><br>
+                                <input type="file" name="update" id="firmware_file"/>
+                                <input type="button" value="Update" onclick="onFunction_updateFirmware_master()"/>
+                                <span id="percentage_fw_e8_updating">0%</span>
+                                <progress value="0" max="100" id="percentage_fw_e8_progress"> </progress>
+                        </form>
+                    </div>
+                </div>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <div class="row">
+                    <div class="col l-12">
+                        <form method="POST" action="/update" enctype="multipart/form-data">
+                            <span>File System Update: </span><br>
+                            <input type="file" name="update" id="fs_file"/>
+                            <input type="button" value="Update" onclick="onFunction_update_fs()"/>
+                            <span id="percentage_fw_fs_updating">0%</span>
+                            <progress value="0" max="100" id="percentage_fw_fs_progress"> </progress>
+                        </form>
+                    </div>
+                </div>
+                <!-- <div class="row">
+                    <div class="col l-12">
+                        <form method="POST" action="/update" enctype="multipart/form-data">
+                            <span>FW CM8: </span><br>
+                            <input type="file" name="update" id="firmware_cm8_file"/>
+                            <input type="button" value="Update" onclick="onFunction_updateFirmware_CM8()"/>
+                            <span id="percentage_fw_cm8_updating">0%</span>
+                            <progress value="0" max="100" id="percentage_fw_cm8_progress"> </progress>
+                        </form>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+        <!-- <div class="main-content active-content">
+            <div  style="font-size: 30px; text-align:center; margin: auto;">SIM</div><br>
+            <table style="margin-left: 44%; width: 12%;">
+                <tr>
+                    <td><div style="font-size: 120%; text-align:center;"> GPS</div></td>
+                    <td><div style="font-size: 120%; text-align:center;"> 4G</div></td>
+                </tr>
+                <tr>
+                    <td class="wireless_status"><div style="font-size: 120%; text-align:center;">0 </div></td>
+                    <td class="wireless_status"><div style="font-size: 120%; text-align:center;">0 </div></td>
+                </tr>
+            </table><br>
+            <table style="margin-left: 41%; width: 25%;">
+                <tr>
+                    <td style="border: 1px solid black; width: 0%;"><div style="text-align:center;">Brand name</div></td>
+                    <td class="simData" style="border: 1px solid black;"><div style="text-align:center;">0</div></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid black; width: 0%;"><div style="text-align:center;">Balance</div></td>
+                    <td class="simData" style="border: 1px solid black;"><div style="text-align:center;">0</div></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid black; width: 0%;"><div style="text-align:center;">Number</div></td>
+                    <td class="simData" style="border: 1px solid black;"><div style="text-align:center;">0</div></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid black; width: 0%;"><div style="text-align:center;">Expiry Date</div></td>
+                    <td class="simData" style="border: 1px solid black;"><div style="text-align: center; vertical-align: middle;">0</div></td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid black; width: 30%;"><div style="text-align:center;">4G Data</div></td>
+                    <td class="simData" style="border: 1px solid black; width: 40%;"><div style="text-align:center;">0</div></td>
+                    <td style="margin-right: 20%;"><button style=" width: 70%;">Check</button></td>
+                </tr>
+            </table><br>
+            <div align= "center"> <button  style="margin: auto; width: 10%;" onclick="getSimData();">Get Sim Data</button></div>
+        </div> -->
+    </div>
+</body>
+</html>

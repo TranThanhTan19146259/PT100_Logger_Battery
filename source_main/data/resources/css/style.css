@@ -1,0 +1,239 @@
+h2{
+    color: aqua;
+    text-align: center;
+}
+
+.topnav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: rgba(189, 182, 182, 0.938);
+  }
+  
+  li {
+    float: left;
+  }
+  
+  li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 12px 16px;
+    text-decoration: none;
+  }
+  
+  li a:hover:not(.active) {
+    background-color: rgba(150, 216, 178, 0.938);
+    /* border-radius: 15px; */
+    border-radius: 10px;
+    background: rgba(150, 216, 178, 0.938);
+    /* padding: 15px;  */
+}
+  
+  .active {
+    border-radius: 10px;
+    background: #04aa8e;
+    /* padding: 15px;  */
+    /* width: 50px;
+    height: 12px;   */
+    background-color: #04aa8e;
+  }
+  .main-content
+  {
+    /* float: center; */
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .main-content {
+    display: none;
+  }
+  .wifi-config{
+    display: none;
+  }
+  .protocol-select
+  {
+    display: none;
+  }
+  .active-content 
+  {
+    display: block;
+  }
+  .topnav-right
+  {
+    /* background-color: rgba(38, 221, 253, 0.938); */
+    float: right;
+  }
+  .line1
+  {
+    height: 1px;
+    background: rgb(7, 215, 252);
+  }
+
+
+  /* slider to change wifi mode */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+  }
+  
+  .switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(25px);
+    -ms-transform: translateX(25px);
+    transform: translateX(25px);
+  }
+  
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+
+  /*************************************************************************/
+  /********************************************DOT************************************************/
+  .dot {
+    height: 10px;
+    width: 10px;
+    background-color: rgb(2, 255, 36);
+    border-radius: 50%;
+    display: inline-block;
+  }
+  /*************************************************************************/
+  /********************************************TABLE SIDE BY SIDE************************************************/
+  .row {
+    box-sizing: content-box;
+  }
+      
+.col {
+  float: left;
+  width: 50%;
+}
+.images-table-display
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.images-table-none {
+  display: none;
+  /* justify-content: space-between;  */
+  /* float: center; */
+  /* margin: auto; */
+  /* align-items: center; Vertically aligns the images */
+}
+.machine-type-image-display {
+  margin: 0 15px;
+  max-width: 100px;
+  /* margin-left: 20%; */
+}
+.machine-type-image-none {
+  display: none;
+}
+
+.machine-type-description-display {
+  text-align: center;
+  /* max-width: 100px; */
+  /* margin-left: 20%; */
+}
+.machine-type-description-none {
+  display: none;
+}
+
+.machine-type-description:hover:not(.active-machine-type){
+  background-color: #C7FFEE;
+  /* border-radius: 15px; */
+  border-radius: 5px;
+  background: #C7FFEE;
+}
+.machine-type-description{
+  cursor: pointer;
+}
+.active-machine-type{
+  border-radius: 5px;
+  background: #00FFB3;
+  /* #00FFB3 */
+  /* padding: 15px;  */
+  /* width: 50px;
+  height: 12px;   */
+  /* background-color: #04aa8e; */
+}
+#query-status{
+  max-width: 100px;
+  
+}
+
+.input-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.input-wrapper input {
+  padding-right: 70px; /* make space for text */
+  width: 14%;
+  height: 25px;
+  font-size: 16px;
+}
+
+.input-wrapper::after {
+  content: "seconds";
+  position: absolute;
+  right: 60%;
+  top: 50%;
+  transform: translateY(-50%);
+  /* transform: translateX(-50%); */
+  color: rgb(0, 0, 0);
+  pointer-events: none; /* allow typing */
+}
+  /* .network-select-table:first-child {
+    background-color: blue;
+    color: white;
+    margin-right: 1%;
+  }
+  
+  .network-config-table:nth-child(2n) {
+    background-color: black;
+    color: white;
+  } */
