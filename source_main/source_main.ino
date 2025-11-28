@@ -20,7 +20,7 @@ Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 13, 12, 14); // ESP32
 // The value of the Rref resistor. Use 430.0 for PT100 and 4300.0 for PT1000
 #define RREF      430.0
 #define RNOMINAL  100.0
-#define CONFIG_BTN 13
+#define CONFIG_BTN 26
 
 void control_sleep_mode()
 {
@@ -48,8 +48,9 @@ void control_sleep_mode()
       }
     case 2:
       {
-        ESP_LOGD(TAG, "Sleep now");
+        ESP_LOGD(TAG, "Sleep for %d seconds",myRam.pt100_data.time_get_data);
         myRam.working_status.esp_working_modes = SLEEP;
+        esp_sleep_enable_ext0_wakeup(GPIO_NUM_26, 0); 
         esp_sleep_enable_timer_wakeup(myRam.pt100_data.time_get_data * 1000000);
         esp_deep_sleep_start();
         sleep_state = 0;
@@ -98,7 +99,6 @@ void setup() {
     Serial.begin( 115200 ); // baud-rate at 19200
     myRam.pt100_data.time_get_data = EEPROM.read(0); // default time send data set to 1s
     initNetwork();
-    thermo.begin(MAX31865_3WIRE);  // set to 2WIRE or 4WIRE as necessary
     myRam.working_status.esp_working_modes = ACTIVE_MODE;
 
     pinMode(CONFIG_BTN, INPUT_PULLUP);
@@ -107,6 +107,7 @@ void setup() {
     {
       initMqtt();
     }
+    thermo.begin(MAX31865_3WIRE);  // set to 2WIRE or 4WIRE as necessary
     // delay(5000);
 }
 
@@ -224,9 +225,9 @@ void loop() {
     // Serial.print("RTD value: "); Serial.println(rtd);
     float ratio = rtd;
     ratio /= 32768;
-    // Serial.print("Ratio = "); Serial.println(ratio,8);
-    // Serial.print("Resistance = "); Serial.println(RREF*ratio,8);
-    // Serial.print("Temperature = "); Serial.println(thermo.temperature(RNOMINAL, RREF));
+    Serial.print("Ratio = "); Serial.println(ratio,8);
+    Serial.print("Resistance = "); Serial.println(RREF*ratio,8);
+    Serial.print("Temperature = "); Serial.println(thermo.temperature(RNOMINAL, RREF));
 
     myRam.pt100_data.temp = thermo.temperature(RNOMINAL, RREF);
     myRam.pt100_data.resistor = RREF*ratio;
