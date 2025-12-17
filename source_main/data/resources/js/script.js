@@ -37,7 +37,7 @@ function get_fw_fs_version()
 function send_time_send()
 {
     let timeSend = parseInt(document.getElementById("t_send_timeSend").value);
-    if(timeSend < 0 || timeSend > 30)
+    if(timeSend < 30 || timeSend > 3 * 60)
     {
         alert("Out of range !!!");
     }
@@ -54,7 +54,8 @@ function send_time_send()
             };
             console.log(JSON.stringify(myObj));// DEBUG
             postRequestHttp(baseUrl,"pt100_data_timeSend","",JSON.stringify(myObj), (dataResponse) =>{
-                console.log(dataResponse);
+                // console.log(dataResponse);
+                alert(dataResponse);
             });
         }
     }

@@ -13,11 +13,15 @@
 #define MQTT_PASSWORD "123456789"
 #define PT100_LOGGER_TOPIC_SUB "PT100_logger/#"
 #define PT100_LOGGER_DATA_TOPIC_PUB "PT100_logger/data"
+#define PT100_LOGGER_STATUS_TOPIC_PUB "PT100_logger/status"
 
 #define PT100_BASE_MQTT_TOPIC         "PT100_logger"
 #define PT100_CONFIG_BASE_MQTT_TOPIC  "config"
+#define PT100_INFO_BASE_MQTT_TOPIC    "info"
 #define PT100_CONFIG_TIMESEND_CMD     "timeSend"
+#define PT100_STATUS_CMD              "status"
 
+#define MQTT_SERVER_TIMEOUT_COUNT 5
 
 
 void initMqtt();

@@ -365,7 +365,9 @@ void on_postReq_time_send_pt100_data(AsyncWebServerRequest *request, uint8_t *da
         ESP_LOGD(TAG, "parsed data timeSend: %d", timeSend);
         EEPROM.write(0, timeSend);
         EEPROM.commit();
-
+        char buf_time_send[80];
+        sprintf(buf_time_send, "Time send is set to %d seconds",timeSend);
+        request->send(200, "text/plain", buf_time_send);
     }
 }
 
@@ -385,6 +387,7 @@ void on_postReq_mqtt_setup(AsyncWebServerRequest *request, uint8_t *data, size_t
         String output;
         readString_from_spiffs(config_mqtt_protocol, output);
         ESP_LOGD(TAG,"---spiffs data---\n %s",output.c_str());
+        request->send(200, "text/plain", "Server set up successfully");
         // DeserializationError error = deserializeJson(doc, (const char*)temp);
         // if (error) {
         //     ESP_LOGD(TAG,"deserializeJson() failed: ");

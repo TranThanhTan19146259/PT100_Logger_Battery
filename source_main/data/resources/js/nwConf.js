@@ -11,5 +11,6 @@ function send_data_mqtt()
     console.log(JSON.stringify(jsonObj));
     postRequestHttp(baseUrl,"config_mqtt","",JSON.stringify(jsonObj), (dataResponse) =>{
         // console.log(dataResponse);
+        alert(dataResponse);
     });
 }

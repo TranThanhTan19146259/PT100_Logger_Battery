@@ -1,0 +1,90 @@
+The 'Apache2.4' service is restarting.
+Starting the 'Apache2.4' service
+The 'Apache2.4' service is running.
+ly determine the server's fully qualified domain name, using fe80::8b5b:f43b:7468:2a31. Set the 'ServerName' directive globally to suppress this message
+[Wed Dec 10 15:39:06.777428 2025] [mpm_winnt:notice] [pid 7828:tid 416] AH00455: Apache/2.4.66 (Win64) configured -- resuming normal operations
+[Wed Dec 10 15:39:06.778428 2025] [mpm_winnt:notice] [pid 7828:tid 416] AH00456: Server built: Dec  6 2025 07:20:52
+[Wed Dec 10 15:39:06.778428 2025] [core:notice] [pid 7828:tid 416] AH00094: Command line: 'D:\\Indruino_Projects\\indruino\\company_project\\PT100_Logger_esp32\\server_win\\httpd-2.4.66-251206-Win64-VS17\\Apache24\\bin\\httpd.exe -d D:/Indruino_Projects/indruino/company_project/PT100_Logger_esp32/server_win/httpd-2.4.66-251206-Win64-VS17/Apache24'
+[Wed Dec 10 15:39:06.782598 2025] [mpm_winnt:notice] [pid 7828:tid 416] AH00418: Parent: Created child process 6212
+AH00558: httpd.exe: Could not reliably determine the server's fully qualified domain name, using fe80::8b5b:f43b:7468:2a31. Set the 'ServerName' directive globally to suppress this message
+AH00558: httpd.exe: Could not reliably determine the server's fully qualified domain name, using fe80::8b5b:f43b:7468:2a31. Set the 'ServerName' directive globally to suppress this message
+[Wed Dec 10 15:39:08.959354 2025] [mpm_winnt:notice] [pid 6212:tid 420] AH00354: Child: Starting 64 worker threads.
+The 'Apache2.4' service is restarting.
+The 'Apache2.4' service has restarted.
+winnt:notice] [pid 7828:tid 416] AH00424: Parent: Received restart signal -- Restarting the server.
+[Wed Dec 10 15:43:02.567553 2025] [mpm_winnt:notice] [pid 7828:tid 416] AH00455: Apache/2.4.66 (Win64) configured -- resuming normal operations
+[Wed Dec 10 15:43:02.567553 2025] [mpm_winnt:notice] [pid 7828:tid 416] AH00456: Server built: Dec  6 2025 07:20:52
+[Wed Dec 10 15:43:02.567553 2025] [core:notice] [pid 7828:tid 416] AH00094: Command line: 'D:\\Indruino_Projects\\indruino\\company_project\\PT100_Logger_esp32\\server_win\\httpd-2.4.66-251206-Win64-VS17\\Apache24\\bin\\httpd.exe -d D:/Indruino_Projects/indruino/company_project/PT100_Logger_esp32/server_win/httpd-2.4.66-251206-Win64-VS17/Apache24'
+[Wed Dec 10 15:43:02.569497 2025] [mpm_winnt:notice] [pid 7828:tid 416] AH00418: Parent: Created child process 2196
+[Wed Dec 10 15:43:03.563085 2025] [mpm_winnt:notice] [pid 2196:tid 432] AH00354: Child: Starting 64 worker threads.
+[Wed Dec 10 15:43:04.569047 2025] [mpm_winnt:notice] [pid 6212:tid 420] AH00364: Child: All worker threads have exited.
+The 'Apache2.4' service is restarting.
+The 'Apache2.4' service has restarted.
+winnt:notice] [pid 7828:tid 416] AH00424: Parent: Received restart signal -- Restarting the server.
+[Wed Dec 10 15:57:32.534112 2025] [mpm_winnt:notice] [pid 7828:tid 416] AH00455: Apache/2.4.66 (Win64) configured -- resuming normal operations
+[Wed Dec 10 15:57:32.534112 2025] [mpm_winnt:notice] [pid 7828:tid 416] AH00456: Server built: Dec  6 2025 07:20:52
+[Wed Dec 10 15:57:32.534112 2025] [core:notice] [pid 7828:tid 416] AH00094: Command line: 'D:\\Indruino_Projects\\indruino\\company_project\\PT100_Logger_esp32\\server_win\\httpd-2.4.66-251206-Win64-VS17\\Apache24\\bin\\httpd.exe -d D:/Indruino_Projects/indruino/company_project/PT100_Logger_esp32/server_win/httpd-2.4.66-251206-Win64-VS17/Apache24'
+[Wed Dec 10 15:57:32.535112 2025] [mpm_winnt:notice] [pid 7828:tid 416] AH00418: Parent: Created child process 2988
+[Wed Dec 10 15:57:33.531351 2025] [mpm_winnt:notice] [pid 2988:tid 476] AH00354: Child: Starting 64 worker threads.
+[Wed Dec 10 15:57:34.531933 2025] [mpm_winnt:notice] [pid 2196:tid 432] AH00364: Child: All worker threads have exited.
+[Wed Dec 10 16:20:44.210175 2025] [mpm_winnt:notice] [pid 7828:tid 416] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Wed Dec 10 16:20:46.222644 2025] [mpm_winnt:notice] [pid 2988:tid 476] AH00364: Child: All worker threads have exited.
+[Wed Dec 10 16:20:46.255775 2025] [mpm_winnt:notice] [pid 7828:tid 416] AH00430: Parent: Child process 2988 exited successfully.
+[Wed Dec 10 16:21:28.063064 2025] [mpm_winnt:notice] [pid 9692:tid 404] AH00455: Apache/2.4.66 (Win64) configured -- resuming normal operations
+[Wed Dec 10 16:21:28.063064 2025] [mpm_winnt:notice] [pid 9692:tid 404] AH00456: Server built: Dec  6 2025 07:20:52
+[Wed Dec 10 16:21:28.063064 2025] [core:notice] [pid 9692:tid 404] AH00094: Command line: 'D:\\Indruino_Projects\\indruino\\company_project\\PT100_Logger_esp32\\server_win\\httpd-2.4.66-251206-Win64-VS17\\Apache24\\bin\\httpd.exe -d D:/Indruino_Projects/indruino/company_project/PT100_Logger_esp32/server_win/httpd-2.4.66-251206-Win64-VS17/Apache24'
+[Wed Dec 10 16:21:28.067090 2025] [mpm_winnt:notice] [pid 9692:tid 404] AH00418: Parent: Created child process 5976
+[Wed Dec 10 16:21:28.412545 2025] [mpm_winnt:notice] [pid 5976:tid 432] AH00354: Child: Starting 64 worker threads.
+[Wed Dec 10 16:21:55.477706 2025] [mpm_winnt:notice] [pid 9692:tid 404] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Wed Dec 10 16:21:57.509850 2025] [mpm_winnt:notice] [pid 5976:tid 432] AH00364: Child: All worker threads have exited.
+[Wed Dec 10 16:21:57.525477 2025] [mpm_winnt:notice] [pid 9692:tid 404] AH00430: Parent: Child process 5976 exited successfully.
+[Wed Dec 10 16:22:29.190707 2025] [mpm_winnt:notice] [pid 5776:tid 416] AH00455: Apache/2.4.66 (Win64) configured -- resuming normal operations
+[Wed Dec 10 16:22:29.206323 2025] [mpm_winnt:notice] [pid 5776:tid 416] AH00456: Server built: Dec  6 2025 07:20:52
+[Wed Dec 10 16:22:29.206323 2025] [core:notice] [pid 5776:tid 416] AH00094: Command line: 'D:\\Indruino_Projects\\indruino\\company_project\\PT100_Logger_esp32\\server_win\\httpd-2.4.66-251206-Win64-VS17\\Apache24\\bin\\httpd.exe -d D:/Indruino_Projects/indruino/company_project/PT100_Logger_esp32/server_win/httpd-2.4.66-251206-Win64-VS17/Apache24'
+[Wed Dec 10 16:22:29.206323 2025] [mpm_winnt:notice] [pid 5776:tid 416] AH00418: Parent: Created child process 8768
+[Wed Dec 10 16:22:29.972137 2025] [mpm_winnt:notice] [pid 8768:tid 432] AH00354: Child: Starting 64 worker threads.
+[Wed Dec 10 19:23:35.161109 2025] [mpm_winnt:notice] [pid 5776:tid 416] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Wed Dec 10 19:23:37.220558 2025] [mpm_winnt:notice] [pid 8768:tid 432] AH00364: Child: All worker threads have exited.
+[Wed Dec 10 19:23:37.236186 2025] [mpm_winnt:notice] [pid 5776:tid 416] AH00430: Parent: Child process 8768 exited successfully.
+[Wed Dec 10 19:24:08.522730 2025] [mpm_winnt:notice] [pid 5976:tid 408] AH00455: Apache/2.4.66 (Win64) configured -- resuming normal operations
+[Wed Dec 10 19:24:08.522730 2025] [mpm_winnt:notice] [pid 5976:tid 408] AH00456: Server built: Dec  6 2025 07:20:52
+[Wed Dec 10 19:24:08.522730 2025] [core:notice] [pid 5976:tid 408] AH00094: Command line: 'D:\\Indruino_Projects\\indruino\\company_project\\PT100_Logger_esp32\\server_win\\httpd-2.4.66-251206-Win64-VS17\\Apache24\\bin\\httpd.exe -d D:/Indruino_Projects/indruino/company_project/PT100_Logger_esp32/server_win/httpd-2.4.66-251206-Win64-VS17/Apache24'
+[Wed Dec 10 19:24:08.522730 2025] [mpm_winnt:notice] [pid 5976:tid 408] AH00418: Parent: Created child process 6952
+[Wed Dec 10 19:24:09.238374 2025] [mpm_winnt:notice] [pid 6952:tid 424] AH00354: Child: Starting 64 worker threads.
+[Wed Dec 10 19:45:38.098742 2025] [mpm_winnt:notice] [pid 5976:tid 408] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Wed Dec 10 19:45:40.113020 2025] [mpm_winnt:notice] [pid 6952:tid 424] AH00364: Child: All worker threads have exited.
+[Wed Dec 10 19:45:40.128641 2025] [mpm_winnt:notice] [pid 5976:tid 408] AH00430: Parent: Child process 6952 exited successfully.
+[Wed Dec 10 19:46:11.776632 2025] [mpm_winnt:notice] [pid 5740:tid 404] AH00455: Apache/2.4.66 (Win64) configured -- resuming normal operations
+[Wed Dec 10 19:46:11.776632 2025] [mpm_winnt:notice] [pid 5740:tid 404] AH00456: Server built: Dec  6 2025 07:20:52
+[Wed Dec 10 19:46:11.776632 2025] [core:notice] [pid 5740:tid 404] AH00094: Command line: 'D:\\Indruino_Projects\\indruino\\company_project\\PT100_Logger_esp32\\server_win\\httpd-2.4.66-251206-Win64-VS17\\Apache24\\bin\\httpd.exe -d D:/Indruino_Projects/indruino/company_project/PT100_Logger_esp32/server_win/httpd-2.4.66-251206-Win64-VS17/Apache24'
+[Wed Dec 10 19:46:11.776632 2025] [mpm_winnt:notice] [pid 5740:tid 404] AH00418: Parent: Created child process 7604
+[Wed Dec 10 19:46:12.425168 2025] [mpm_winnt:notice] [pid 7604:tid 420] AH00354: Child: Starting 64 worker threads.
+[Fri Dec 12 14:07:12.210198 2025] [core:warn] [pid 6020:tid 408] AH00098: pid file D:/Indruino_Projects/indruino/company_project/PT100_Logger_esp32/server_win/httpd-2.4.66-251206-Win64-VS17/Apache24/logs/httpd.pid overwritten -- Unclean shutdown of previous Apache run?
+[Fri Dec 12 14:07:12.212237 2025] [mpm_winnt:notice] [pid 6020:tid 408] AH00455: Apache/2.4.66 (Win64) configured -- resuming normal operations
+[Fri Dec 12 14:07:12.212237 2025] [mpm_winnt:notice] [pid 6020:tid 408] AH00456: Server built: Dec  6 2025 07:20:52
+[Fri Dec 12 14:07:12.212237 2025] [core:notice] [pid 6020:tid 408] AH00094: Command line: 'D:\\Indruino_Projects\\indruino\\company_project\\PT100_Logger_esp32\\server_win\\httpd-2.4.66-251206-Win64-VS17\\Apache24\\bin\\httpd.exe -d D:/Indruino_Projects/indruino/company_project/PT100_Logger_esp32/server_win/httpd-2.4.66-251206-Win64-VS17/Apache24'
+[Fri Dec 12 14:07:12.212237 2025] [mpm_winnt:notice] [pid 6020:tid 408] AH00418: Parent: Created child process 6884
+[Fri Dec 12 14:07:12.942807 2025] [mpm_winnt:notice] [pid 6884:tid 448] AH00354: Child: Starting 64 worker threads.
+[Sat Dec 13 14:46:00.443914 2025] [core:warn] [pid 5792:tid 404] AH00098: pid file D:/Indruino_Projects/indruino/company_project/PT100_Logger_esp32/server_win/httpd-2.4.66-251206-Win64-VS17/Apache24/logs/httpd.pid overwritten -- Unclean shutdown of previous Apache run?
+[Sat Dec 13 14:46:00.443914 2025] [mpm_winnt:notice] [pid 5792:tid 404] AH00455: Apache/2.4.66 (Win64) configured -- resuming normal operations
+[Sat Dec 13 14:46:00.443914 2025] [mpm_winnt:notice] [pid 5792:tid 404] AH00456: Server built: Dec  6 2025 07:20:52
+[Sat Dec 13 14:46:00.443914 2025] [core:notice] [pid 5792:tid 404] AH00094: Command line: 'D:\\Indruino_Projects\\indruino\\company_project\\PT100_Logger_esp32\\server_win\\httpd-2.4.66-251206-Win64-VS17\\Apache24\\bin\\httpd.exe -d D:/Indruino_Projects/indruino/company_project/PT100_Logger_esp32/server_win/httpd-2.4.66-251206-Win64-VS17/Apache24'
+[Sat Dec 13 14:46:00.443914 2025] [mpm_winnt:notice] [pid 5792:tid 404] AH00418: Parent: Created child process 8844
+[Sat Dec 13 14:46:02.296204 2025] [mpm_winnt:notice] [pid 8844:tid 432] AH00354: Child: Starting 64 worker threads.
+The 'Apache2.4' service is restarting.
+The 'Apache2.4' service has restarted.
+winnt:notice] [pid 5792:tid 404] AH00424: Parent: Received restart signal -- Restarting the server.
+[Sat Dec 13 15:34:24.033141 2025] [mpm_winnt:notice] [pid 5792:tid 404] AH00455: Apache/2.4.66 (Win64) configured -- resuming normal operations
+[Sat Dec 13 15:34:24.033141 2025] [mpm_winnt:notice] [pid 5792:tid 404] AH00456: Server built: Dec  6 2025 07:20:52
+[Sat Dec 13 15:34:24.033141 2025] [core:notice] [pid 5792:tid 404] AH00094: Command line: 'D:\\Indruino_Projects\\indruino\\company_project\\PT100_Logger_esp32\\server_win\\httpd-2.4.66-251206-Win64-VS17\\Apache24\\bin\\httpd.exe -d D:/Indruino_Projects/indruino/company_project/PT100_Logger_esp32/server_win/httpd-2.4.66-251206-Win64-VS17/Apache24'
+[Sat Dec 13 15:34:24.048764 2025] [mpm_winnt:notice] [pid 5792:tid 404] AH00418: Parent: Created child process 5260
+[Sat Dec 13 15:34:25.026191 2025] [mpm_winnt:notice] [pid 5260:tid 448] AH00354: Child: Starting 64 worker threads.
+[Sat Dec 13 15:34:26.037058 2025] [mpm_winnt:notice] [pid 8844:tid 432] AH00364: Child: All worker threads have exited.
+[Mon Dec 15 21:37:48.727952 2025] [mpm_winnt:notice] [pid 5792:tid 404] AH00422: Parent: Received shutdown signal -- Shutting down the server.
+[Mon Dec 15 21:37:50.749536 2025] [mpm_winnt:notice] [pid 5260:tid 448] AH00364: Child: All worker threads have exited.
+[Mon Dec 15 21:37:50.765202 2025] [mpm_winnt:notice] [pid 5792:tid 404] AH00430: Parent: Child process 5260 exited successfully.
+[Mon Dec 15 21:39:39.284804 2025] [mpm_winnt:notice] [pid 5824:tid 404] AH00455: Apache/2.4.66 (Win64) configured -- resuming normal operations
+[Mon Dec 15 21:39:39.286832 2025] [mpm_winnt:notice] [pid 5824:tid 404] AH00456: Server built: Dec  6 2025 07:20:52
+[Mon Dec 15 21:39:39.286832 2025] [core:notice] [pid 5824:tid 404] AH00094: Command line: 'D:\\Indruino_Projects\\indruino\\company_project\\PT100_Logger_esp32\\server_win\\httpd-2.4.66-251206-Win64-VS17\\Apache24\\bin\\httpd.exe -d D:/Indruino_Projects/indruino/company_project/PT100_Logger_esp32/server_win/httpd-2.4.66-251206-Win64-VS17/Apache24'
+[Mon Dec 15 21:39:39.286832 2025] [mpm_winnt:notice] [pid 5824:tid 404] AH00418: Parent: Created child process 8532
+[Mon Dec 15 21:39:39.895892 2025] [mpm_winnt:notice] [pid 8532:tid 420] AH00354: Child: Starting 64 worker threads.

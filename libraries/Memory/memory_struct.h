@@ -36,7 +36,8 @@ typedef enum Esp_working_modes{
     ENTER_SLEEP_MODE,
     SLEEP,
     ACTIVE_MODE,
-    CONFIG_MODE
+    CONFIG_MODE,
+    SEND_LASTWILL_MSG
 } Esp_working_modes_e;
 
 typedef struct Esp_working_status

@@ -20,6 +20,7 @@ Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 13, 12, 14); // ESP32
 // The value of the Rref resistor. Use 430.0 for PT100 and 4300.0 for PT1000
 #define RREF      430.0
 #define RNOMINAL  100.0
+// #define CONFIG_BTN 13
 #define CONFIG_BTN 26
 
 void control_sleep_mode()
@@ -44,13 +45,19 @@ void control_sleep_mode()
         {
           sleep_state = 2;
         }
+        // if (millis() - t_enter_sleep_mode > 8000)
+        // {
+          // myRam.working_status.esp_working_modes = SEND_LASTWILL_MSG;
+        // }
+        
       break;
       }
     case 2:
       {
         ESP_LOGD(TAG, "Sleep for %d seconds",myRam.pt100_data.time_get_data);
         myRam.working_status.esp_working_modes = SLEEP;
-        esp_sleep_enable_ext0_wakeup(GPIO_NUM_26, 0); 
+        // esp_sleep_enable_ext0_wakeup(GPIO_NUM_26, 0); 
+        esp_sleep_enable_ext0_wakeup(GPIO_NUM_13, 0); 
         esp_sleep_enable_timer_wakeup(myRam.pt100_data.time_get_data * 1000000);
         esp_deep_sleep_start();
         sleep_state = 0;
@@ -119,7 +126,7 @@ void loop() {
       if (WiFi.status() == WL_CONNECTED)
       {
           myRam.wifi_config_data.is_wifi_connected = 1;
-          if (myRam.working_status.esp_working_modes == ACTIVE_MODE)
+          if (myRam.working_status.esp_working_modes != SLEEP)
           {
             handle_mqtt();
           }
@@ -225,37 +232,37 @@ void loop() {
     // Serial.print("RTD value: "); Serial.println(rtd);
     float ratio = rtd;
     ratio /= 32768;
-    Serial.print("Ratio = "); Serial.println(ratio,8);
-    Serial.print("Resistance = "); Serial.println(RREF*ratio,8);
-    Serial.print("Temperature = "); Serial.println(thermo.temperature(RNOMINAL, RREF));
+    // Serial.print("Ratio = "); Serial.println(ratio,8);
+    // Serial.print("Resistance = "); Serial.println(RREF*ratio,8);
+    // Serial.print("Temperature = "); Serial.println(thermo.temperature(RNOMINAL, RREF));
 
     myRam.pt100_data.temp = thermo.temperature(RNOMINAL, RREF);
     myRam.pt100_data.resistor = RREF*ratio;
 
-    uint8_t fault = thermo.readFault();
-    if (fault) {
-      Serial.print("Fault 0x"); Serial.println(fault, HEX);
-      if (fault & MAX31865_FAULT_HIGHTHRESH) {
-        Serial.println("RTD High Threshold"); 
-      }
-      if (fault & MAX31865_FAULT_LOWTHRESH) {
-        Serial.println("RTD Low Threshold"); 
-      }
-      if (fault & MAX31865_FAULT_REFINLOW) {
-        Serial.println("REFIN- > 0.85 x Bias"); 
-      }
-      if (fault & MAX31865_FAULT_REFINHIGH) {
-        Serial.println("REFIN- < 0.85 x Bias - FORCE- open"); 
-      }
-      if (fault & MAX31865_FAULT_RTDINLOW) {
-        Serial.println("RTDIN- < 0.85 x Bias - FORCE- open"); 
-      }
-      if (fault & MAX31865_FAULT_OVUV) {
-        Serial.println("Under/Over voltage"); 
-      }
-      thermo.clearFault();
-    }
-    Serial.println();
+    // uint8_t fault = thermo.readFault();
+    // if (fault) {
+    //   Serial.print("Fault 0x"); Serial.println(fault, HEX);
+    //   if (fault & MAX31865_FAULT_HIGHTHRESH) {
+    //     Serial.println("RTD High Threshold"); 
+    //   }
+    //   if (fault & MAX31865_FAULT_LOWTHRESH) {
+    //     Serial.println("RTD Low Threshold"); 
+    //   }
+    //   if (fault & MAX31865_FAULT_REFINLOW) {
+    //     Serial.println("REFIN- > 0.85 x Bias"); 
+    //   }
+    //   if (fault & MAX31865_FAULT_REFINHIGH) {
+    //     Serial.println("REFIN- < 0.85 x Bias - FORCE- open"); 
+    //   }
+    //   if (fault & MAX31865_FAULT_RTDINLOW) {
+    //     Serial.println("RTDIN- < 0.85 x Bias - FORCE- open"); 
+    //   }
+    //   if (fault & MAX31865_FAULT_OVUV) {
+    //     Serial.println("Under/Over voltage"); 
+    //   }
+    //   thermo.clearFault();
+    // }
+    // Serial.println();
     t_update_data = millis();
   }
   

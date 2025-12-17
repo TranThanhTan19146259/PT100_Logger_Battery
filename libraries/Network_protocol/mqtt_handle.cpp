@@ -23,9 +23,9 @@ void callback(char* topic, byte *payload, unsigned int length)
       token = strtok(NULL, s);
       i++;
     }
-    // Serial.println(buf[0]);
-    // Serial.println(buf[1]);
-    // Serial.println(buf[2]);
+    Serial.println(buf[0]);
+    Serial.println(buf[1]);
+    Serial.println(buf[2]);
     if (memcmp(buf[0], PT100_BASE_MQTT_TOPIC, strlen(PT100_BASE_MQTT_TOPIC)) == 0)
     {
       ESP_LOGD(TAG,"correct base!");
@@ -34,7 +34,7 @@ void callback(char* topic, byte *payload, unsigned int length)
         ESP_LOGD(TAG,"correct base config!");
         if (memcmp(buf[2], PT100_CONFIG_TIMESEND_CMD, strlen(PT100_CONFIG_TIMESEND_CMD)) == 0)
         {
-          Serial.print("message: ");
+          Serial.print("message config: ");
           Serial.write(payload, length);
           Serial.println(); 
           String payload_str;
@@ -42,10 +42,9 @@ void callback(char* topic, byte *payload, unsigned int length)
           {
             payload_str += (char)payload[i];
           }
-          // Serial.write(payload, length);
           Serial.println(payload_str); 
+          // parse json string of time send from server 
           StaticJsonDocument<48> doc;
-
           DeserializationError error = deserializeJson(doc, payload_str);
 
           if (error) {
@@ -58,8 +57,30 @@ void callback(char* topic, byte *payload, unsigned int length)
           
           ESP_LOGD(TAG,"start configuring time send for esp32 at: %d", timeSend);
           myRam.pt100_data.time_get_data = timeSend;
+          // generate response of timesend to publish to server 
+          String output;
+          String str_timeSend_response;
+          str_timeSend_response = "Time send is set to " + String(myRam.pt100_data.time_get_data) + " seconds";
+          StaticJsonDocument<80> doc_response_timeSend;
+          doc_response_timeSend["response"] = str_timeSend_response;
+          serializeJson(doc_response_timeSend, output);
+          Serial.println(output);
+          send_data_mqtt(PT100_LOGGER_DATA_TOPIC_PUB, output);
+
           EEPROM.write(0, myRam.pt100_data.time_get_data);
           EEPROM.commit();
+        }
+        
+      }
+      if (memcmp(buf[1], PT100_INFO_BASE_MQTT_TOPIC, strlen(PT100_INFO_BASE_MQTT_TOPIC)) == 0)
+      {
+        ESP_LOGD(TAG,"correct base infor!");
+        if (memcmp(buf[2], PT100_STATUS_CMD, strlen(PT100_STATUS_CMD)) == 0)
+        {
+          Serial.print("message infor: ");
+          Serial.write(payload, length);
+          Serial.println(); 
+          send_data_mqtt(PT100_LOGGER_STATUS_TOPIC_PUB, "pong");
         }
       }
       
@@ -95,7 +116,8 @@ void connect_to_broker(char *usr, char *pass)
         Serial.print(client.state());
         Serial.println(" try again in 2 seconds");
     }
-    if (disc_to_sv_counter > 10)
+    //check how many times device disconnect to server
+    if (disc_to_sv_counter > MQTT_SERVER_TIMEOUT_COUNT)
     {
       myRam.working_status.esp_working_modes = ENTER_SLEEP_MODE;
     }
@@ -173,6 +195,7 @@ void handle_mqtt()
       send_data_mqtt(PT100_LOGGER_DATA_TOPIC_PUB, output);
       myRam.working_status.esp_working_modes = ENTER_SLEEP_MODE;
     }
+    
   }
   
   
