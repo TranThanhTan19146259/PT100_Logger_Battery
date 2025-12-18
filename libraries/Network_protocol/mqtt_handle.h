@@ -15,6 +15,8 @@
 #define PT100_LOGGER_DATA_TOPIC_PUB "PT100_logger/data"
 #define PT100_LOGGER_STATUS_TOPIC_PUB "PT100_logger/status"
 
+#define PT100_LOGGER_TB_PUBLISH "v1/devices/me/telemetry"
+
 #define PT100_BASE_MQTT_TOPIC         "PT100_logger"
 #define PT100_CONFIG_BASE_MQTT_TOPIC  "config"
 #define PT100_INFO_BASE_MQTT_TOPIC    "info"

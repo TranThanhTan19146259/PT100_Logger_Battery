@@ -24,7 +24,7 @@ void setup() {
 
   // Enable ext0 wake up on the button pin. 
   // The ESP32 will wake up when the pin is pulled LOW (button pressed).
-  esp_sleep_enable_ext0_wakeup(GPIO_NUM_26, 0); 
+  esp_sleep_enable_ext0_wakeup(GPIO_NUM_13, 0); 
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
   Serial.println("Entering deep sleep...");
   // Wait for a moment to ensure the wake up reason is printed

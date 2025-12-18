@@ -2446,3 +2446,17 @@
 2025-12-15 21:39:38 [7332] WARN  broker.c:1376: EMQX Edge (ver 1.2.0) Serving HTTP Server on http://0.0.0.0:8081
 2025-12-15 21:39:38 [7332] WARN  broker.c:1458: NanoMQ Broker is started successfully!
 
+2025-12-18 09:46:00 [7976] WARN  broker.c:2149: Default bridging Clientid is nanomq-a5706fb3
+2025-12-18 09:46:00 [7976] WARN  broker.c:1262: EMQX Edge (ver 1.2.0) Serving MQTT TCP on nmq-tcp://0.0.0.0:1883
+2025-12-18 09:46:00 [7976] WARN  broker.c:1290: EMQX Edge (ver 1.2.0) Serving MQTT over WebSocket on nmq-ws://0.0.0.0:8083/mqtt
+2025-12-18 09:46:00 [7976] WARN  web_server.c:313: Http Server folder set to D:\Indruino_Projects\indruino\company_project\PT100_Logger_esp32\server_win\emqx-edge-1.2.0-windows-x86_64/dist
+2025-12-18 09:46:00 [7976] WARN  broker.c:1376: EMQX Edge (ver 1.2.0) Serving HTTP Server on http://0.0.0.0:8081
+2025-12-18 09:46:00 [7976] WARN  broker.c:1458: NanoMQ Broker is started successfully!
+
+2025-12-18 11:25:33 [7536] WARN  broker.c:2149: Default bridging Clientid is nanomq-7a729396
+2025-12-18 11:25:33 [7536] WARN  broker.c:1262: EMQX Edge (ver 1.2.0) Serving MQTT TCP on nmq-tcp://0.0.0.0:1883
+2025-12-18 11:25:33 [7536] WARN  broker.c:1290: EMQX Edge (ver 1.2.0) Serving MQTT over WebSocket on nmq-ws://0.0.0.0:8083/mqtt
+2025-12-18 11:25:33 [7536] WARN  web_server.c:313: Http Server folder set to D:\Indruino_Projects\indruino\company_project\PT100_Logger_esp32\server_win\emqx-edge-1.2.0-windows-x86_64/dist
+2025-12-18 11:25:33 [7536] WARN  broker.c:1376: EMQX Edge (ver 1.2.0) Serving HTTP Server on http://0.0.0.0:8081
+2025-12-18 11:25:33 [7536] WARN  broker.c:1458: NanoMQ Broker is started successfully!
+

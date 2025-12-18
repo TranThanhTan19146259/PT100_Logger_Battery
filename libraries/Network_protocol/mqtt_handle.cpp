@@ -182,21 +182,28 @@ void initMqtt()
 void handle_mqtt()
 {
   reconnectMqtt();
-  if (isConnectedBroker == 1)
+  static uint32_t t_send_data = 0;  
+  if (millis() - t_send_data > 1000)
   {
-    if (myRam.working_status.esp_working_modes == ACTIVE_MODE)
+    if (isConnectedBroker == 1)
     {
-      String output;
-      StaticJsonDocument<32> doc;
-      doc["temp"] = myRam.pt100_data.temp;
-      doc["R"] = myRam.pt100_data.resistor;
+      if (myRam.working_status.esp_working_modes == ACTIVE_MODE)
+      {
+        String output;
+        StaticJsonDocument<32> doc;
+        doc["temp"] = myRam.pt100_data.temp;
+        doc["R"] = myRam.pt100_data.resistor;
 
-      serializeJson(doc, output);
-      send_data_mqtt(PT100_LOGGER_DATA_TOPIC_PUB, output);
-      myRam.working_status.esp_working_modes = ENTER_SLEEP_MODE;
+        serializeJson(doc, output);
+        send_data_mqtt(PT100_LOGGER_TB_PUBLISH, output);
+        myRam.working_status.esp_working_modes = ENTER_SLEEP_MODE;
+      }
+      
     }
-    
+
+    t_send_data = millis();
   }
+  
   
   
   // static uint32_t t_send_data_to_sv;
