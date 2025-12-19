@@ -60,7 +60,7 @@ void factory_reset()
   doc_wifi["mode_AP_STA"] = 0;
 
   JsonArray ssid = doc_wifi.createNestedArray("ssid");
-  ssid.add("PT100_LOGGER");
+  ssid.add("indr_LOAD_CELL");
   ssid.add("");
 
   JsonArray password = doc_wifi.createNestedArray("password");
@@ -91,12 +91,12 @@ void mqtt_handle_task_code(void * parameter)
     while(1)
     {
         // ESP_LOGD(TAG,"connect falg: %d",myRam.wifi_config_data.is_wifi_connected);
-        if (myRam.working_status.esp_working_modes != SLEEP)
+        if (myRam.wifi_config_data.wifi_ap_sta == 1)
         {
-            handle_mqtt();
-        }
-        if (myRam.wifi_config_data.is_wifi_connected == 1)
-        {
+          if (myRam.working_status.esp_working_modes != SLEEP)
+          {
+              handle_mqtt();
+          }
             // ESP_LOGD(TAG, "MQTT!!!!!"); 
         }
     }
@@ -120,23 +120,11 @@ void init_hw()
 
 void handle_hw()
 {
-  control_sleep_mode();
-  static uint32_t t_send_data;
-  if (millis() - t_send_data > 1000)
-  {
-    ESP_LOGD(TAG, "adc: %d", analogRead(ADC_PIN));
-    t_send_data = millis();
-  }
-  
   static bool now_wifi_status, last_wifi_status;
   if (myRam.wifi_config_data.wifi_ap_sta == 1)
   {
       if (WiFi.status() == WL_CONNECTED)
       {
-        //   if (myRam.working_status.esp_working_modes != SLEEP)
-        //   {
-        //     handle_mqtt();
-        //   }
         myRam.wifi_config_data.is_wifi_connected = 1;
       }
       else
@@ -185,9 +173,6 @@ void handle_hw()
               }
               ESP_LOGD(TAG, "static ip: %s", myRam.wifi_config_data.STA_IP.c_str());
               ESP_LOGD(TAG, "splitted ip: %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
-              // myRam.Modbus_properties.buf_data_modbus[IP_FIRST_BYTE] = ip[0] | (ip[1] << 8);
-              // myRam.Modbus_properties.buf_data_modbus[IP_FIRST_BYTE + 1] = ip[2] | (ip[3] << 8);
-              // myRam.Modbus_properties.read_write_modbus = 1;
           }
           last_wifi_status = now_wifi_status;
       }
@@ -230,54 +215,5 @@ void handle_hw()
     //     config_state = 0;
     //   }
   
-  }
-    
-  static uint32_t t_update_data;
-  if (millis() - t_update_data > 1000)
-  {
-    uint16_t rtd = thermo.readRTD();
-
-    // Serial.print("RTD value: "); Serial.println(rtd);
-    float ratio = rtd;
-    ratio /= 32768;
-    // ESP_LOGD(TAG,"btn: %d", digitalRead(CONFIG_BTN));
-    // Serial.print("Ratio = "); Serial.println(ratio,8);
-    // Serial.print("Resistance = "); Serial.println(RREF*ratio,8);
-    // Serial.print("Temperature = "); Serial.println(thermo.temperature(RNOMINAL, RREF));
-
-    // myRam.pt100_data.temp = thermo.temperature(RNOMINAL, RREF);
-    myRam.pt100_data.temp = analogRead(ADC_PIN);
-    myRam.pt100_data.resistor = RREF*ratio;
-    // #ifdef SIMULATE_DATA
-    // #else
-    // myRam.pt100_data.temp = RREF*ratio;
-    // #endif
-
-
-    // uint8_t fault = thermo.readFault();
-    // if (fault) {
-    //   Serial.print("Fault 0x"); Serial.println(fault, HEX);
-    //   if (fault & MAX31865_FAULT_HIGHTHRESH) {
-    //     Serial.println("RTD High Threshold"); 
-    //   }
-    //   if (fault & MAX31865_FAULT_LOWTHRESH) {
-    //     Serial.println("RTD Low Threshold"); 
-    //   }
-    //   if (fault & MAX31865_FAULT_REFINLOW) {
-    //     Serial.println("REFIN- > 0.85 x Bias"); 
-    //   }
-    //   if (fault & MAX31865_FAULT_REFINHIGH) {
-    //     Serial.println("REFIN- < 0.85 x Bias - FORCE- open"); 
-    //   }
-    //   if (fault & MAX31865_FAULT_RTDINLOW) {
-    //     Serial.println("RTDIN- < 0.85 x Bias - FORCE- open"); 
-    //   }
-    //   if (fault & MAX31865_FAULT_OVUV) {
-    //     Serial.println("Under/Over voltage"); 
-    //   }
-    //   thermo.clearFault();
-    // }
-    // Serial.println();
-    t_update_data = millis();
   }
 }

@@ -191,12 +191,14 @@ void handle_mqtt()
       {
         String output;
         StaticJsonDocument<32> doc;
-        doc["temp"] = myRam.pt100_data.temp;
+        // doc["temp"] = myRam.pt100_data.temp;
+        doc["temp"] = 100;
         doc["R"] = myRam.pt100_data.resistor;
 
         serializeJson(doc, output);
         send_data_mqtt(PT100_LOGGER_TB_PUBLISH, output);
-        myRam.working_status.esp_working_modes = ENTER_SLEEP_MODE;
+        // Serial.println(output);
+        // myRam.working_status.esp_working_modes = ENTER_SLEEP_MODE;
       }
       
     }

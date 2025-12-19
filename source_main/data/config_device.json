@@ -1,5 +1,5 @@
 {
     "mode_AP_STA": 0,
-    "ssid": ["PT100_LOGGER",""],
+    "ssid": ["indr_LOAD_CELL",""],
     "password": ["0123456789",""]
 }
