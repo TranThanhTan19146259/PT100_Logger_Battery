@@ -24,7 +24,7 @@
 #define PT100_STATUS_CMD              "status"
 
 #define MQTT_SERVER_TIMEOUT_COUNT 5
-
+#define MQTT_MAX_BUFFER 3000
 
 void initMqtt();
 void reconnectMqtt();

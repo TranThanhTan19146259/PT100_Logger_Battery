@@ -1,7 +1,7 @@
 #include "hw_handle.h"
 TaskHandle_t MqttTask;  
-TaskHandle_t HwHandleTask;  
-
+TaskHandle_t GetTimeTask;  
+TaskHandle_t Sync_data;
 
 Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 13, 12, 14); // ESP32 
 
@@ -56,52 +56,53 @@ void factory_reset()
 {
   String output, output_wifi, output_pair_key, output_mqtt_server;
   StaticJsonDocument<192> doc_wifi;
-
   doc_wifi["mode_AP_STA"] = 0;
-
   JsonArray ssid = doc_wifi.createNestedArray("ssid");
   ssid.add("PT100_LOGGER");
   ssid.add("");
-
   JsonArray password = doc_wifi.createNestedArray("password");
   password.add("0123456789");
   password.add("");
-  // DEBUG_SERIAL.println(output_wifi);
   serializeJson(doc_wifi, output_wifi);
   writeString_to_spiffs(config_device,output_wifi);
-
-  // StaticJsonDocument<256> doc_mqtt_server;
-  // doc_pair_key["host"] = "";
-  // doc_pair_key["port"] = "";
-  // doc_pair_key["username"] = "";
-  // doc_pair_key["password"] = "";
-  // serializeJson(doc_mqtt_server, output_mqtt_server);
-  // writeString_to_spiffs(config_mqtt_protocol,output_mqtt_server);
   ESP.restart();
 }
 
 void mqtt_handle_task_code(void * parameter)
 {
-    Serial.print("Mqtt Task is running on core ");
-    // Serial.println(xPortGetCoreID());  
+    // Serial.print("Mqtt Task is running on core ");
     if (myRam.wifi_config_data.wifi_ap_sta == 1)
     {
       initMqtt();
     }
     while(1)
     {
-        // ESP_LOGD(TAG,"connect falg: %d",myRam.wifi_config_data.is_wifi_connected);
         if (myRam.working_status.esp_working_modes != SLEEP)
         {
             handle_mqtt();
         }
-        if (myRam.wifi_config_data.is_wifi_connected == 1)
-        {
-            // ESP_LOGD(TAG, "MQTT!!!!!"); 
-        }
     }
 }
 
+void time_ntp_task_code(void *parameter)
+{
+    init_Ntp();
+    while(1)
+    {
+      handle_Ntp();
+    }
+}
+
+
+void sync_data_task_code(void *parameter)
+{
+  init_sync_data();
+  while (1)
+  {
+    handle_sync_data();
+  }
+  
+}
 
 void init_hw()
 {
@@ -114,13 +115,19 @@ void init_hw()
     myRam.working_status.esp_working_modes = ACTIVE_MODE;
 
     thermo.begin(MAX31865_3WIRE);  // set to 2WIRE or 4WIRE as necessary
-    xTaskCreatePinnedToCore(mqtt_handle_task_code,"mqtt",30000,NULL,1,&MqttTask,1);  delay(500);   
+    // init_Ntp();
+    xTaskCreatePinnedToCore(mqtt_handle_task_code,"mqtt",8096,NULL,1,&MqttTask,1);  delay(50);   
+    xTaskCreatePinnedToCore(time_ntp_task_code,"ntp",4096,NULL,1,&GetTimeTask,1);  delay(50);   
+    xTaskCreatePinnedToCore(sync_data_task_code,"sync_data",8096,NULL,1,&Sync_data,1);  delay(50);   
     
 }
 
 void handle_hw()
 {
   control_sleep_mode();
+  handleNetwork();
+  // handle_Ntp();
+  
   static uint32_t t_send_data;
   if (millis() - t_send_data > 1000)
   {
@@ -128,110 +135,7 @@ void handle_hw()
     t_send_data = millis();
   }
   
-  static bool now_wifi_status, last_wifi_status;
-  if (myRam.wifi_config_data.wifi_ap_sta == 1)
-  {
-      if (WiFi.status() == WL_CONNECTED)
-      {
-        //   if (myRam.working_status.esp_working_modes != SLEEP)
-        //   {
-        //     handle_mqtt();
-        //   }
-        myRam.wifi_config_data.is_wifi_connected = 1;
-      }
-      else
-      {
-          static uint32_t t_count_disconnect;
 
-          if (millis() - t_count_disconnect > 5000)
-          {
-              WiFi.mode(WIFI_STA); 
-              WiFi.begin(myRam.wifi_config_data.ssid_sta.c_str(), myRam.wifi_config_data.password_sta.c_str());
-              Serial.print("CONNECTING TO CONNECTED TO ");
-              Serial.println(myRam.wifi_config_data.ssid_sta);
-              static uint32_t t_disc_wifi;
-              ESP_LOGD(TAG,"wifi_disc_count: %d", t_disc_wifi);
-              if (t_disc_wifi > 10)
-              {
-                t_disc_wifi = 10;
-                myRam.working_status.esp_working_modes = ENTER_SLEEP_MODE;
-              }
-              
-              t_disc_wifi++;
-              t_count_disconnect = millis();
-          }
-          
-          myRam.wifi_config_data.is_wifi_connected = 0;
-      }
-      now_wifi_status = myRam.wifi_config_data.is_wifi_connected;
-      if (now_wifi_status != last_wifi_status )
-      {
-          if (now_wifi_status == 1)
-          {
-              myRam.wifi_config_data.STA_IP = WiFi.localIP().toString();
-
-              Serial.print("IP: ");
-              Serial.println(myRam.wifi_config_data.STA_IP);
-              Serial.print("CONNECTED TO ");
-              Serial.println(myRam.wifi_config_data.ssid_sta);
-              String static_ip = myRam.wifi_config_data.STA_IP;
-              char *token = strtok((char*)static_ip.c_str(), "."); // get sta ip
-              int idx = 0;
-              uint16_t ip[4];
-              while(token != NULL){
-                  ip[idx] = atoi(token);
-                  token = strtok(NULL, ".");
-                  ++idx;
-              }
-              ESP_LOGD(TAG, "static ip: %s", myRam.wifi_config_data.STA_IP.c_str());
-              ESP_LOGD(TAG, "splitted ip: %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
-              // myRam.Modbus_properties.buf_data_modbus[IP_FIRST_BYTE] = ip[0] | (ip[1] << 8);
-              // myRam.Modbus_properties.buf_data_modbus[IP_FIRST_BYTE + 1] = ip[2] | (ip[3] << 8);
-              // myRam.Modbus_properties.read_write_modbus = 1;
-          }
-          last_wifi_status = now_wifi_status;
-      }
-    //   static uint8_t config_state;
-    //   static uint32_t t_start_configuring;
-    //   if (digitalRead(CONFIG_BTN) == 0)
-    //   {
-    //     myRam.working_status.esp_working_modes = CONFIG_MODE;
-
-    //     switch (config_state)
-    //     {
-    //     case 0:
-    //       {
-    //         ESP_LOGD(TAG, "start configuring");    
-    //         config_state = 1;
-    //         break;
-    //       }
-    //     case 1:
-    //       {
-    //         t_start_configuring = millis();
-    //         config_state = 2;
-    //         break;    
-    //       }
-    //     case 2:
-    //       {
-    //         if (millis() - t_start_configuring > 5000)
-    //         {
-    //           ESP_LOGD(TAG, "CONFIGGGGG");    
-    //           factory_reset();
-    //           ESP.restart();
-    //         }
-    //         break;
-    //       }
-    //     default:
-    //       break;
-    //     }
-    //   }
-    //   else
-    //   {
-    //     config_state = 0;
-    //   }
-  
-  }
-    
   static uint32_t t_update_data;
   if (millis() - t_update_data > 1000)
   {

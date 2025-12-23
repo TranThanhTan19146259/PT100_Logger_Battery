@@ -111,15 +111,16 @@ void connect_to_broker(char *usr, char *pass)
     }
     else
     {
-        disc_to_sv_counter++;
-        Serial.print("failed, rc=");
-        Serial.print(client.state());
-        Serial.println(" try again in 2 seconds");
+      isConnectedBroker = 0;
+      disc_to_sv_counter++;
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 2 seconds");
     }
     //check how many times device disconnect to server
     if (disc_to_sv_counter > MQTT_SERVER_TIMEOUT_COUNT)
     {
-      myRam.working_status.esp_working_modes = ENTER_SLEEP_MODE;
+      // myRam.working_status.esp_working_modes = ENTER_SLEEP_MODE;
     }
     
   }
@@ -175,28 +176,177 @@ void initMqtt()
   myRam.mqtt_config_data.password = password; 
   client.setServer(myRam.mqtt_config_data.host.c_str(), myRam.mqtt_config_data.port);
   client.setCallback(callback);
-  // client.setBufferSize(MQTT_MAX_BUFFER);
+  client.setBufferSize(MQTT_MAX_BUFFER);
   connect_to_broker((char*)myRam.mqtt_config_data.username.c_str(), (char*)myRam.mqtt_config_data.password.c_str());
 }
 
 void handle_mqtt()
 {
   reconnectMqtt();
-  static uint32_t t_send_data = 0;  
+  static uint32_t t_send_data = 0;
+  static uint32_t t_bk_data = 0;
+  static uint8_t state_generate_buf_temp_time_bk;  
+  if ((isConnectedBroker == 0 || myRam.wifi_config_data.is_wifi_connected == 0) && myRam.ntp_time.get_time_ok == 1)
+  {
+    myRam.mqtt_config_data.isConnectToBroker = 0;
+    myRam.data_sync.sync_state = START_ASSIGN_DATA_TO_RAM;
+  }
+  // if (millis() - t_bk_data > 1000)
+  // {
+  //   // switch (state_generate_buf_temp_time_bk)
+  //   // {
+  //   // case 0:
+  //   //   {
+  //   //     myRam.data_sync.buf_temp = new float[BUFFER_TEMP_DATA_BACKUP_SIZE];
+  //   //     myRam.data_sync.buf_time = new String[BUFFER_TIME_DATA_BACKUP_SIZE];
+  //   //     state_generate_buf_temp_time_bk = 1;
+  //   //     break;
+  //   //   }
+  //   // case 1: 
+  //   //   {
+  //   //     break;
+  //   //   }
+  //   // }
+    
+  //   if ((isConnectedBroker == 0 || myRam.wifi_config_data.is_wifi_connected == 0) && myRam.ntp_time.get_time_ok == 1)
+  //   {
+  //     myRam.data_sync.sync_state = START_ASSIGN_DATA_TO_RAM;
+  //     // if (myRam.data_sync.temp_ptr >= BUFFER_TEMP_DATA_BACKUP_SIZE)
+  //     // {
+  //     //   myRam.data_sync.temp_ptr = 0;
+  //     //   myRam.data_sync.time_ptr = 0;
+  //     //   // state_generate_buf_temp_time_bk = 0;
+  //     //   delete[] myRam.data_sync.buf_temp; // Deallocate the entire array.
+  //     //   myRam.data_sync.buf_temp = nullptr;
+
+  //     //   delete[] myRam.data_sync.buf_time; // Deallocate the entire array.
+  //     //   myRam.data_sync.buf_time = nullptr;
+  //     //   ESP_LOGD(TAG,"FULLLLLLLL");
+  //     //   myRam.data_sync.buf_temp = new float[BUFFER_TEMP_DATA_BACKUP_SIZE];
+  //     //   myRam.data_sync.buf_time = new String[BUFFER_TIME_DATA_BACKUP_SIZE];
+  //     //   myRam.data_sync.start_sync_data_to_sv = 0;
+  //     // }
+  //     // else
+  //     // {
+  //     //   myRam.data_sync.buf_temp[myRam.data_sync.temp_ptr] = myRam.pt100_data.temp;
+  //     //   myRam.data_sync.buf_time[myRam.data_sync.time_ptr] = myRam.ntp_time.ntpTimeString;
+  //     //   myRam.data_sync.temp_ptr++;
+  //     //   myRam.data_sync.time_ptr++;
+  //     //   myRam.data_sync.start_sync_data_to_sv = 1;
+  //     // }
+      
+  //     // ESP_LOGD(TAG,"ESP RAM MEMORY: %d totalTempPtr: %d totalTimePtr: %d", ESP.getFreeHeap(), myRam.data_sync.temp_ptr, myRam.data_sync.time_ptr);
+  //   }
+  //   t_bk_data = millis();
+  // }
+  
+
   if (millis() - t_send_data > 1000)
   {
     if (isConnectedBroker == 1)
     {
       if (myRam.working_status.esp_working_modes == ACTIVE_MODE)
       {
-        String output;
-        StaticJsonDocument<32> doc;
-        doc["temp"] = myRam.pt100_data.temp;
-        doc["R"] = myRam.pt100_data.resistor;
+        myRam.mqtt_config_data.isConnectToBroker = 1;
+        switch (myRam.data_sync.sync_state)
+        {
+        case START_SEND_RAM_DATA_TO_SV:
+        {
+          //generate json string to send to thingsboard
+          StaticJsonDocument<MQTT_MAX_BUFFER> doc_temp_time;
+          ESP_LOGD(TAG, "length data: %d", myRam.data_sync.temp_ptr);
+          JsonArray temp_his = doc_temp_time.createNestedArray("temp_his");
+          JsonArray time_his = doc_temp_time.createNestedArray("time_his");
+          doc_temp_time["sync_flag"] = 1;
+          for (uint16_t i = 0; i < myRam.data_sync.temp_ptr; i++)
+          {
+            temp_his.add(myRam.data_sync.buf_temp[i]);
+            time_his.add(myRam.data_sync.buf_time[i]);
+          }
+          ESP_LOGD(TAG, "SEND DATA!!!!");
+          String output_time_temp;
+          serializeJson(doc_temp_time, output_time_temp);
+          Serial.println(output_time_temp);
+          send_data_mqtt(PT100_LOGGER_TB_PUBLISH, output_time_temp);
+          myRam.data_sync.sync_state = CLEAR_RAM_DATA;
+          break;
+        }
+        default:
+          break;
+        }
+          
+        if (myRam.data_sync.is_remaining_data == 1)
+        {
 
-        serializeJson(doc, output);
-        send_data_mqtt(PT100_LOGGER_TB_PUBLISH, output);
-        myRam.working_status.esp_working_modes = ENTER_SLEEP_MODE;
+          // myRam.data_sync.sync_state = START_SYNC_RAM_DATA_TO_SV;
+          // StaticJsonDocument<MQTT_MAX_BUFFER> doc_temp_time;
+          
+          // static uint8_t state_sync_data_sv;
+          // static uint32_t t_send_data_to_sv;
+          // switch (state_sync_data_sv)
+          // {
+          // case 0:
+          // {
+          //   t_send_data_to_sv = millis();
+          //   ESP_LOGD(TAG, "Start sending data to server");
+          //   state_sync_data_sv = 1;
+          //   break;
+          // }
+          // case 1:
+          // { 
+          //   if (millis() - t_send_data_to_sv > 2000)
+          //   {
+          //     state_sync_data_sv = 2;
+          //     t_send_data_to_sv = millis();
+          //   }
+          //   break;
+          // }
+          // case 2:
+          // {
+          //   ESP_LOGD(TAG, "SEND DATA!!!!");
+          //   String output_time_temp;
+          //   serializeJson(doc_temp_time, output_time_temp);
+          //   Serial.println(output_time_temp);
+          //   // send_data_mqtt(PT100_LOGGER_TB_PUBLISH, output_time_temp);
+          //   state_sync_data_sv = 3;
+          //   break;
+          // }
+          // case 3:
+          // {
+          //   ESP_LOGD(TAG, "CLEAR ALL SYNC DATA");
+          //   myRam.data_sync.temp_ptr = 0;
+          //   myRam.data_sync.time_ptr = 0;
+          //   state_generate_buf_temp_time_bk = 0;
+          //   delete[] myRam.data_sync.buf_temp; // Deallocate the entire array.
+          //   myRam.data_sync.buf_temp = nullptr;
+
+          //   delete[] myRam.data_sync.buf_time; // Deallocate the entire array.
+          //   myRam.data_sync.buf_time = nullptr;
+          //   myRam.data_sync.start_sync_data_to_sv = 0;
+          //   state_sync_data_sv = 0;
+          //   break;
+          // }
+          // default:
+          //   break;
+          // }
+        }
+        
+        if (myRam.ntp_time.get_time_ok == 1 && (myRam.data_sync.sync_state == FIRST_STARTUP_MEMORY || myRam.data_sync.sync_state == DONE_SYNC_RAM_DATA_TO_SV))
+        {
+          String output;
+          StaticJsonDocument<256> doc;
+          doc["temp"] = myRam.pt100_data.temp;
+          doc["R"] = myRam.pt100_data.resistor;
+          doc["sync_flag"] = 1;
+          doc["temp_his"][0] = myRam.pt100_data.temp;
+          doc["time_his"][0] = myRam.ntp_time.ntpTimeString;
+          serializeJson(doc, output);
+          Serial.println(output);
+          send_data_mqtt(PT100_LOGGER_TB_PUBLISH, output);
+        }
+        
+        
+        // myRam.working_status.esp_working_modes = ENTER_SLEEP_MODE;
       }
       
     }
