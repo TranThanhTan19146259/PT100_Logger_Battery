@@ -67,6 +67,16 @@ client.on('message', function (topic, message) {
     // console.log("online");
     console.log(message.toString());
   }
+  if(topic == "PT100_logger/data/display")
+  {
+    let recv_data_json = JSON.parse(message);
+    mqtt_data_input = recv_data_json
+    // loadInitialData(recv_data_json);
+
+    // temp_data = parseInt(recv_data_json.temp);
+    // addDataChart(parseInt(recv_data_json.temp))
+    // console.log(`msg: ${temp_arr_raw.temp}`);
+  }
 })
 
 function ping_device()

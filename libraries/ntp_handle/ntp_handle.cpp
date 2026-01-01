@@ -36,10 +36,7 @@ void handle_Ntp()
     if (millis() - t_update_time_data > 1000)
     {
         ESP_LOGD(TAG, "get time flag: %d", myRam.ntp_time.get_time_ok);
-        sprintf(buf_time_string, "%d/%d/%d - %d:%d:%d", myRam.ntp_time.ntpTime.tm_mday, 
-                                                        myRam.ntp_time.ntpTime.tm_mon, 
-                                                        myRam.ntp_time.ntpTime.tm_year, 
-                                                        myRam.ntp_time.ntpTime.tm_hour,
+        sprintf(buf_time_string, "%d:%d:%d",            myRam.ntp_time.ntpTime.tm_hour,
                                                         myRam.ntp_time.ntpTime.tm_min, 
                                                         myRam.ntp_time.ntpTime.tm_sec
                 );

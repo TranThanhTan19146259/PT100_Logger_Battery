@@ -6,7 +6,8 @@ function send_data_mqtt()
         host:       mqtt_infor[0].value,
         port:       mqtt_infor[1].value,
         username:   mqtt_infor[2].value,
-        password:   mqtt_infor[3].value
+        password:   mqtt_infor[3].value,
+        devId:      mqtt_infor[4].value
     }
     console.log(JSON.stringify(jsonObj));
     postRequestHttp(baseUrl,"config_mqtt","",JSON.stringify(jsonObj), (dataResponse) =>{

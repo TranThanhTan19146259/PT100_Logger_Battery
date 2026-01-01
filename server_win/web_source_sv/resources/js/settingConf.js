@@ -49,24 +49,24 @@ function change_wifi_mode()
 {
     let allDataSettings_AP = document.getElementsByClassName("settings-tab-input-ap");
     let allDataSettings_STA = document.getElementsByClassName("settings-tab-input-sta");
-    document.getElementsByClassName("slider")[0].addEventListener('change', function() {
-        const main_content = document.getElementsByClassName("wifi-config");
-        if (this.checked) {
-            console.log("Checkbox is checked..");
-            allDataSettings_STA[0].value = "";
-            allDataSettings_STA[1].value = "";
-            // allDataSettings_STA[2].value = "";
-            main_content[1].classList.add("active-content");
-            main_content[0].classList.remove("active-content");
-        } else {
-            allDataSettings_AP[0].value = "";
-            allDataSettings_AP[1].value = "";
-            // allDataSettings_AP[2].value = "";
-            main_content[0].classList.add("active-content");
-            main_content[1].classList.remove("active-content");
-            console.log("Checkbox is not checked..");
-        }
-      });
+    // document.getElementsByClassName("slider")[0].addEventListener('change', function() {
+    //     const main_content = document.getElementsByClassName("wifi-config");
+    //     if (this.checked) {
+    //         console.log("Checkbox is checked..");
+    //         allDataSettings_STA[0].value = "";
+    //         allDataSettings_STA[1].value = "";
+    //         // allDataSettings_STA[2].value = "";
+    //         main_content[1].classList.add("active-content");
+    //         main_content[0].classList.remove("active-content");
+    //     } else {
+    //         allDataSettings_AP[0].value = "";
+    //         allDataSettings_AP[1].value = "";
+    //         // allDataSettings_AP[2].value = "";
+    //         main_content[0].classList.add("active-content");
+    //         main_content[1].classList.remove("active-content");
+    //         console.log("Checkbox is not checked..");
+    //     }
+    //   });
 }
 
 function onFunction_updateFirmware_master()

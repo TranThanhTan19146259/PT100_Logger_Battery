@@ -32,11 +32,14 @@ typedef struct Mqtt_config_data
     String username;
     String password;
     bool isConnectToBroker;
+    String devId;
 } Mqtt_config_data_t;
 
 typedef struct ntp_time
 {
     String ntpTimeString;
+    String ntpDateString;
+    String ntpDateTimeString;
     struct tm ntpTime;
     bool get_time_ok = 0;
 } Ntp_time_t;
@@ -60,6 +63,7 @@ typedef struct sync_data_sv_backup
     uint32_t time_ptr;
     uint32_t temp_ptr;
     bool is_remaining_data;
+    uint32_t mqtt_buff_ptr = 0;;
     state_sync_data_backup_e sync_state;
 }sync_data_sv_backup_t;
 

@@ -1,3 +1,5 @@
+
+
 h2{
     color: aqua;
     text-align: center;
@@ -227,13 +229,101 @@ h2{
   color: rgb(0, 0, 0);
   pointer-events: none; /* allow typing */
 }
-  /* .network-select-table:first-child {
-    background-color: blue;
-    color: white;
-    margin-right: 1%;
-  }
-  
-  .network-config-table:nth-child(2n) {
-    background-color: black;
-    color: white;
-  } */
+
+
+
+/* body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+} */
+.container {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  max-width: 800px;
+  width: 90%;
+}
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+.info {
+  text-align: center;
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+#chartContainer {
+  position: relative;
+  height: 400px;
+}
+.input-section {
+  margin-bottom: 25px;
+}
+.input-group {
+  margin-bottom: 15px;
+}
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #333;
+}
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.device-btn{
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+  width: 100%;
+}
+
+button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+button:hover {
+  transform: translateY(-2px);
+}
+button:active {
+  transform: translateY(0);
+}
+#errorMsg {
+  margin-top: 10px;
+  color: #e74c3c;
+  font-size: 14px;
+  min-height: 20px;
+}

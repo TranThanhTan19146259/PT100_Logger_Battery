@@ -14,6 +14,7 @@
 #define PT100_LOGGER_TOPIC_SUB "PT100_logger/#"
 #define PT100_LOGGER_DATA_TOPIC_PUB "PT100_logger/data"
 #define PT100_LOGGER_STATUS_TOPIC_PUB "PT100_logger/status"
+#define PT100_LOGGER_DATA_DISPLAY_TOPIC_PUB "PT100_logger/data/display"
 
 #define PT100_LOGGER_TB_PUBLISH "v1/devices/me/telemetry"
 
@@ -25,6 +26,8 @@
 
 #define MQTT_SERVER_TIMEOUT_COUNT 5
 #define MQTT_MAX_BUFFER 3000
+#define MAX_BUFFER_DATA_POINTS_SEND_TO_SV 30
+
 
 void initMqtt();
 void reconnectMqtt();

@@ -66,9 +66,8 @@ void handle_sync_data()
         }
     case WAIT_TO_SEND_RAM_DATA_TO_SV:
         {
-            if (millis() - t_send_data_to_sv > 1000)
+            if (millis() - t_send_data_to_sv > 2000)
             {
-            //   state_sync_data_sv = 2;
                 myRam.data_sync.sync_state = START_SEND_RAM_DATA_TO_SV;
                 t_send_data_to_sv = millis();
             }
@@ -76,7 +75,6 @@ void handle_sync_data()
         }
     case START_SEND_RAM_DATA_TO_SV:
         {
-            // myRam.data_sync.sync_state = CLEAR_RAM_DATA;
             break;
         }
     case CLEAR_RAM_DATA:
@@ -84,18 +82,15 @@ void handle_sync_data()
             ESP_LOGD(TAG, "CLEAR ALL SYNC DATA");
             myRam.data_sync.temp_ptr = 0;
             myRam.data_sync.time_ptr = 0;
-            // state_generate_buf_temp_time_bk = 0;
             delete[] myRam.data_sync.buf_temp; // Deallocate the entire array.
             myRam.data_sync.buf_temp = nullptr;
-
             delete[] myRam.data_sync.buf_time; // Deallocate the entire array.
             myRam.data_sync.buf_time = nullptr;
             myRam.data_sync.buf_temp = new float[BUFFER_TEMP_DATA_BACKUP_SIZE];
             myRam.data_sync.buf_time = new String[BUFFER_TIME_DATA_BACKUP_SIZE];
-            delay(2000);
+            myRam.data_sync.mqtt_buff_ptr = 0;
+            delay(3000);
             myRam.data_sync.sync_state = DONE_SYNC_RAM_DATA_TO_SV;
-            // myRam.data_sync.start_sync_data_to_sv = 0;
-            // state_sync_data_sv = 0;
             break;
         }
     default:
