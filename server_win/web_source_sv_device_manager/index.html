@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Manager</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="resources/css/style.css" type="text/css">
+    <script src="resources/js/mqtt_lib/mqtt.min.js"></script>
+    <script src="resources/js/mqtt_server_info.js"></script>
+    <script src="resources/js/http_methods.js"></script>
+    <script src="resources/js/mqtt_handle.js"></script>
+    <script src="resources/js/db_server_infor.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- Then load your custom chart file -->
+    <script src="/resources/js/chart_handle.js"></script>
+    <script src="/resources/js/device_manager.js"></script>
+    <script src="/resources/js/history_table_handle.js"></script>
+    <script src="/resources/js/db_handle.js"></script>
+
+</head>
+<body>
+    <div id="deviceListView">
+        <h1>Devices</h1>
+        <table class="devices-container"></table>
+    </div>
+
+    <div id="deviceDetailView" class="device-detail">
+        <button class="back-btn" onclick="showDeviceList()">← Back to Devices</button>
+        
+        <div class="detail-header">
+            <h2 id="deviceName">Device 1</h2>
+            <span id="deviceStatus" class="status-badge status-online">Online</span>
+        </div>
+
+        <div class="info-section">
+            <h3>Device Information</h3>
+            <div class="info-item">
+                <span class="info-label">Device ID:</span>
+                <span class="info-value" id="deviceId">DEV-001</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Last Updated:</span>
+                <span class="info-value" id="lastUpdated">2 minutes ago</span>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>Recent Data</h3>
+            <ul class="data-list" id="deviceData">
+                <li>Temperature: --</li>
+                <li>Time: --</li>
+            </ul>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('chart')">Chart</button>
+            <button class="tab-btn" onclick="switchTab('history')">History</button>
+        </div>
+
+        <!-- Chart Tab -->
+        <div id="chartTab" class="tab-content active">
+            <div class="chart-container">
+                <canvas class="tempChart" id="temperatureChart"></canvas>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="historyTab" class="tab-content">
+            <div class="history-container">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Time</th>
+                            <th>Temperature</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr>
+                            <td colspan="3" style="text-align: center; color: #999;">No data available</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        
+    </script>
+</body>
+</html>
