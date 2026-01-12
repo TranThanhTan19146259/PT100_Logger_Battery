@@ -9,6 +9,7 @@ typedef struct PT100_data_t
     float temp;
     uint16_t resistor;
     uint8_t time_get_data;
+    uint8_t sampleRate;
 } PT100_data;
 
 typedef struct Wifi_config_data
@@ -43,6 +44,16 @@ typedef struct ntp_time
     struct tm ntpTime;
     bool get_time_ok = 0;
 } Ntp_time_t;
+
+typedef struct LocalServer_time
+{
+    String localServerTimeString;
+    String localServerDateString;
+    String localServerDateTimeString;
+    struct tm localServerTime;
+    bool get_time_ok = 0;
+} LocalServer_time_t;
+
 
 typedef enum state_sync_data_backup
 {

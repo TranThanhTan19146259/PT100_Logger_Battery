@@ -1,4 +1,4 @@
-let mqtt_url = "192.168.1.104"
+let mqtt_url = "192.168.1.11"
 let mqtt_client_id = ""
 let mqtt_usr = "Indr_Pt100"
 let mqtt_pass = "123456789"
@@ -12,6 +12,6 @@ function generate_mqtt_client_id()
     for ( var i = 0; i < length; i++ ) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-    mqtt_client_id = "Indr_Pt100_client_" + result 
-    // console.log(mqtt_client_id);
+    mqtt_client_id = "Indr_Pt100_client_" + result
+    console.log(mqtt_client_id);
 }

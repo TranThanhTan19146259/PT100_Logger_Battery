@@ -93,7 +93,6 @@ void time_ntp_task_code(void *parameter)
     }
 }
 
-
 void sync_data_task_code(void *parameter)
 {
   init_sync_data();
@@ -109,6 +108,12 @@ void init_hw()
     EEPROM.begin(10);
     Serial.begin( 115200 ); // baud-rate at 19200
     myRam.pt100_data.time_get_data = EEPROM.read(0); // default time send data set to 1s
+    myRam.pt100_data.sampleRate = EEPROM.read(1);
+    if (myRam.pt100_data.sampleRate == 0 || myRam.pt100_data.sampleRate > 0xF0)
+    {
+      /* code */
+      myRam.pt100_data.sampleRate = 1; // when the sample of this device did not set, set the sample rate to 1 second for default
+    }
     pinMode(CONFIG_BTN, INPUT_PULLUP);
     pinMode(ADC_PIN, INPUT);
     initNetwork();
@@ -118,7 +123,10 @@ void init_hw()
     // init_Ntp();
     xTaskCreatePinnedToCore(mqtt_handle_task_code,"mqtt",8096,NULL,1,&MqttTask,1);  delay(50);   
     xTaskCreatePinnedToCore(time_ntp_task_code,"ntp",4096,NULL,1,&GetTimeTask,1);  delay(50);   
-    xTaskCreatePinnedToCore(sync_data_task_code,"sync_data",8096,NULL,1,&Sync_data,1);  delay(50);   
+    xTaskCreatePinnedToCore(sync_data_task_code,"sync_data",8096,NULL,1,&Sync_data,1);  delay(50);  
+    // initTimeServerLocal();
+    // ESP_LOGD(TAG,"DevId:%s SR: %d", myRam.mqtt_config_data.devId.c_str(), myRam.pt100_data.sampleRate);
+
     
 }
 
@@ -126,6 +134,7 @@ void handle_hw()
 {
   control_sleep_mode();
   handleNetwork();
+  // handleTimeServerLocal();
   // handle_Ntp();
   
   static uint32_t t_send_data;
@@ -137,7 +146,7 @@ void handle_hw()
   
 
   static uint32_t t_update_data;
-  if (millis() - t_update_data > 1000)
+  if (millis() - t_update_data > myRam.pt100_data.sampleRate*1000)
   {
     uint16_t rtd = thermo.readRTD();
 

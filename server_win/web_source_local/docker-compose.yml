@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  ntp:
+    image: cturra/ntp
+    container_name: ntp-server
+    restart: always
+    ports:
+      - "123:123/udp"
+    environment:
+      - NTP_SERVERS=time.google.com,pool.ntp.org,time.cloudflare.com
+      - LOG_LEVEL=0
+    cap_add:
+      - SYS_TIME
+      - SYS_NICE
+    network_mode: host
+  mongodb:
+    image: mongo:4.4
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+
+  app:
+    image: node:20-alpine
+    container_name: Indr_PT100_sv
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app:/app
+    command: sh -c "cd /app && ls -la && npm install && node /app/server.js"
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+networks:
+  app-network:

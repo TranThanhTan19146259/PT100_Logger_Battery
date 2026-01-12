@@ -29,60 +29,53 @@ void callback(char* topic, byte *payload, unsigned int length)
     if (memcmp(buf[0], PT100_BASE_MQTT_TOPIC, strlen(PT100_BASE_MQTT_TOPIC)) == 0)
     {
       ESP_LOGD(TAG,"correct base!");
-      if (memcmp(buf[1], PT100_CONFIG_BASE_MQTT_TOPIC, strlen(PT100_CONFIG_BASE_MQTT_TOPIC)) == 0)
+      if (memcmp(buf[1], myRam.mqtt_config_data.devId.c_str(), strlen(myRam.mqtt_config_data.devId.c_str())) == 0)
       {
-        ESP_LOGD(TAG,"correct base config!");
-        if (memcmp(buf[2], PT100_CONFIG_TIMESEND_CMD, strlen(PT100_CONFIG_TIMESEND_CMD)) == 0)
+        ESP_LOGD(TAG,"correct devId!");
+        if (memcmp(buf[2], PT100_MQTT_CONTROL_TOPIC, strlen(PT100_MQTT_CONTROL_TOPIC)) == 0)
         {
-          Serial.print("message config: ");
-          Serial.write(payload, length);
-          Serial.println(); 
+          ESP_LOGD(TAG,"correct control!");
           String payload_str;
           for (uint8_t i = 0; i < length; i++)
           {
             payload_str += (char)payload[i];
           }
           Serial.println(payload_str); 
-          // parse json string of time send from server 
-          StaticJsonDocument<48> doc;
+          StaticJsonDocument<128> doc;
           DeserializationError error = deserializeJson(doc, payload_str);
 
           if (error) {
-            Serial.print("deserializeJson() failed: ");
-            Serial.println(error.c_str());
+            Serial.print(F("deserializeJson() failed: "));
+            Serial.println(error.f_str());
             return;
           }
-
-          int timeSend = doc["timeSend"]; // 5
+          const char* cmd = doc["cmd"]; // "sampleRate"
+          int value = doc["value"]; // 50
+          const char* status = doc["status"]; // check this data come from device or server, if data com from server there will be no "status" data
+          Serial.print("status ");
+          Serial.println(status);
+          if (status == nullptr || *status == '\0')
+          {
+            if (memcmp(cmd, PT100_SAMPLE_RATE_CMD, strlen(PT100_SAMPLE_RATE_CMD)) == 0)
+            {
+              myRam.pt100_data.sampleRate = value;
+              EEPROM.write(1, value);
+              EEPROM.commit();
+              String output;
+              StaticJsonDocument<128> doc;
+              doc["cmd"] = PT100_SAMPLE_RATE_CMD;
+              doc["value"] = myRam.pt100_data.sampleRate;
+              doc["status"] = "ok";
+              serializeJson(doc, output);
+              String mqtt_topic_data = "Indr_PT100/" + myRam.mqtt_config_data.devId + "/" + PT100_MQTT_CONTROL_TOPIC;
+              send_data_mqtt(mqtt_topic_data, output);
+            }
+          }
           
-          ESP_LOGD(TAG,"start configuring time send for esp32 at: %d", timeSend);
-          myRam.pt100_data.time_get_data = timeSend;
-          // generate response of timesend to publish to server 
-          String output;
-          String str_timeSend_response;
-          str_timeSend_response = "Time send is set to " + String(myRam.pt100_data.time_get_data) + " seconds";
-          StaticJsonDocument<80> doc_response_timeSend;
-          doc_response_timeSend["response"] = str_timeSend_response;
-          serializeJson(doc_response_timeSend, output);
-          Serial.println(output);
-          // send_data_mqtt(PT100_LOGGER_DATA_TOPIC_PUB, output);
-
-          EEPROM.write(0, myRam.pt100_data.time_get_data);
-          EEPROM.commit();
-        }
-        
-      }
-      if (memcmp(buf[1], PT100_INFO_BASE_MQTT_TOPIC, strlen(PT100_INFO_BASE_MQTT_TOPIC)) == 0)
-      {
-        ESP_LOGD(TAG,"correct base infor!");
-        if (memcmp(buf[2], PT100_STATUS_CMD, strlen(PT100_STATUS_CMD)) == 0)
-        {
-          Serial.print("message infor: ");
-          Serial.write(payload, length);
-          Serial.println(); 
-          // send_data_mqtt(PT100_LOGGER_STATUS_TOPIC_PUB, "pong");
+          
         }
       }
+      
       
     }
 
@@ -106,7 +99,9 @@ void connect_to_broker(char *usr, char *pass)
       isConnectedBroker = 1;
       disc_to_sv_counter = 0;
       Serial.println("connected");
-      client.subscribe(PT100_LOGGER_TOPIC_SUB);
+      char buf_sub_topic[100];
+      sprintf(buf_sub_topic,"%s/%s/control",PT100_BASE_MQTT_TOPIC, myRam.mqtt_config_data.devId.c_str());
+      client.subscribe(buf_sub_topic);
 
     }
     else
@@ -188,12 +183,13 @@ void handle_mqtt()
   static uint32_t t_send_data = 0;
   static uint32_t t_bk_data = 0;
   static uint8_t state_generate_buf_temp_time_bk;  
-  if ((isConnectedBroker == 0 || myRam.wifi_config_data.is_wifi_connected == 0) && myRam.ntp_time.get_time_ok == 1)
+  // if ((isConnectedBroker == 0 || myRam.wifi_config_data.is_wifi_connected == 0) && myRam.localServer_time.get_time_ok == 1) // use this condition for local server time
+  if ((isConnectedBroker == 0 || myRam.wifi_config_data.is_wifi_connected == 0) && myRam.ntp_time.get_time_ok == 1) // use this condition for ntp server time
   {
     myRam.mqtt_config_data.isConnectToBroker = 0;
     myRam.data_sync.sync_state = START_ASSIGN_DATA_TO_RAM;
   }
-  if (millis() - t_send_data > 1000)
+  if (millis() - t_send_data > myRam.pt100_data.sampleRate * 1000)
   {
     if (isConnectedBroker == 1)
     {
@@ -252,18 +248,20 @@ void handle_mqtt()
         default:
           break;
         }
-        if (myRam.ntp_time.get_time_ok == 1 && (myRam.data_sync.sync_state == FIRST_STARTUP_MEMORY || myRam.data_sync.sync_state == DONE_SYNC_RAM_DATA_TO_SV))
+        // if (myRam.localServer_time.get_time_ok == 1 && (myRam.data_sync.sync_state == FIRST_STARTUP_MEMORY || myRam.data_sync.sync_state == DONE_SYNC_RAM_DATA_TO_SV))
+        if (myRam.ntp_time.get_time_ok == 1 && (myRam.data_sync.sync_state == FIRST_STARTUP_MEMORY || myRam.data_sync.sync_state == DONE_SYNC_RAM_DATA_TO_SV)) // use this condition for ntp server time
         {
           String output;
-          StaticJsonDocument<256> doc;
+          StaticJsonDocument<512> doc;
+          doc["mac"] = myRam.wifi_config_data.MAC_Address;
+          doc["ip"] = myRam.wifi_config_data.STA_IP;
+          doc["SR"] = myRam.pt100_data.sampleRate;
           doc["temp"] = myRam.pt100_data.temp;
-          doc["time"] = myRam.ntp_time.ntpTimeString;
+          doc["time"] = myRam.ntp_time.ntpDateTimeString; // ntp server time
+          // doc["time"] = myRam.localServer_time.localServerDateTimeString; // local server time
           doc["temp_his"][0] = myRam.pt100_data.temp;
-          doc["time_his"][0] = myRam.ntp_time.ntpTimeString;
-          // doc["R"] = myRam.pt100_data.resistor;
-          // doc["sync_flag"] = 1;
-          // doc["temp_his"][0] = myRam.pt100_data.temp;
-          // doc["time_his"][0] = myRam.ntp_time.ntpTimeString;
+          doc["time_his"][0] = myRam.ntp_time.ntpDateTimeString;
+          // doc["time_his"][0] = myRam.localServer_time.localServerDateTimeString;
           serializeJson(doc, output);
           Serial.println(output);
           String mqtt_topic_data = "Indr_PT100/" + myRam.mqtt_config_data.devId + "/lastestData";

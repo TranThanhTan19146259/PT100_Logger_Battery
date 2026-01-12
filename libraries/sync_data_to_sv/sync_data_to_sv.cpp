@@ -3,7 +3,7 @@
 void save_offline_data()
 {
     static uint32_t t_bk_data_offline;
-    if (millis() - t_bk_data_offline > BACKUP_TIME_WHEN_DEVICE_OFFLINE)
+    if (millis() - t_bk_data_offline > myRam.pt100_data.sampleRate * 1000)
     {
         if (myRam.data_sync.temp_ptr >= BUFFER_TEMP_DATA_BACKUP_SIZE)
         {
@@ -23,7 +23,8 @@ void save_offline_data()
         else
         {
             myRam.data_sync.buf_temp[myRam.data_sync.temp_ptr] = myRam.pt100_data.temp;
-            myRam.data_sync.buf_time[myRam.data_sync.time_ptr] = myRam.ntp_time.ntpTimeString;
+            myRam.data_sync.buf_time[myRam.data_sync.time_ptr] = myRam.ntp_time.ntpDateTimeString;
+            // myRam.data_sync.buf_time[myRam.data_sync.time_ptr] = myRam.localServer_time.localServerDateTimeString;
             myRam.data_sync.temp_ptr++;
             myRam.data_sync.time_ptr++;
             myRam.data_sync.is_remaining_data = 1;
@@ -66,7 +67,7 @@ void handle_sync_data()
         }
     case WAIT_TO_SEND_RAM_DATA_TO_SV:
         {
-            if (millis() - t_send_data_to_sv > 2000)
+            if (millis() - t_send_data_to_sv > 200)
             {
                 myRam.data_sync.sync_state = START_SEND_RAM_DATA_TO_SV;
                 t_send_data_to_sv = millis();
@@ -89,7 +90,7 @@ void handle_sync_data()
             myRam.data_sync.buf_temp = new float[BUFFER_TEMP_DATA_BACKUP_SIZE];
             myRam.data_sync.buf_time = new String[BUFFER_TIME_DATA_BACKUP_SIZE];
             myRam.data_sync.mqtt_buff_ptr = 0;
-            delay(3000);
+            // delay(500);
             myRam.data_sync.sync_state = DONE_SYNC_RAM_DATA_TO_SV;
             break;
         }

@@ -1,4 +1,4 @@
-let mqtt_url = "192.168.1.11"
+let mqtt_url = "192.168.1.106"
 let mqtt_client_id = ""
 let mqtt_usr = "Indr_Pt100"
 let mqtt_pass = "123456789"

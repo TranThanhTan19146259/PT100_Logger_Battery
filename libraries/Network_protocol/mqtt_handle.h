@@ -11,20 +11,18 @@
 #define MQTT_PORT     1883
 #define MQTT_USERNAME "Indr_Pt100"
 #define MQTT_PASSWORD "123456789"
-#define PT100_LOGGER_TOPIC_SUB "PT100_logger/#"
+// #define PT100_LOGGER_TOPIC_SUB "Indr_PT100/#"
 #define PT100_LOGGER_DATA_TOPIC_PUB "PT100_logger/data"
 #define PT100_LOGGER_STATUS_TOPIC_PUB "PT100_logger/status"
 #define PT100_LOGGER_DATA_DISPLAY_TOPIC_PUB "PT100_logger/data/display"
 
 #define PT100_LOGGER_TB_PUBLISH "v1/devices/me/telemetry"
 
-#define PT100_BASE_MQTT_TOPIC         "PT100_logger"
-#define PT100_CONFIG_BASE_MQTT_TOPIC  "config"
-#define PT100_INFO_BASE_MQTT_TOPIC    "info"
-#define PT100_CONFIG_TIMESEND_CMD     "timeSend"
-#define PT100_STATUS_CMD              "status"
+#define PT100_BASE_MQTT_TOPIC         "Indr_PT100"
+#define PT100_MQTT_CONTROL_TOPIC      "control"
+#define PT100_SAMPLE_RATE_CMD         "sampleRate"
 
-#define MQTT_SERVER_TIMEOUT_COUNT 5
+#define MQTT_SERVER_TIMEOUT_COUNT 5 
 #define MQTT_MAX_BUFFER 3000
 #define MAX_BUFFER_DATA_POINTS_SEND_TO_SV 30
 

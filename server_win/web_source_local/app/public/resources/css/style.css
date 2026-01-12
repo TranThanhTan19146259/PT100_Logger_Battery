@@ -1,0 +1,246 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f5f5;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+  font-size: 2.5em;
+}
+
+.devices-container {
+  max-width: 800px;
+  margin: 0 auto;
+  border-collapse: separate;
+  border-spacing: 10px;
+}
+
+.devices-container td {
+  padding: 0;
+}
+
+.device-btn {
+  width: 140px;
+  padding: 15px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  /* background: rgb(62, 235, 27); */
+  background: gray;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.device-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  /* background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); */
+}
+
+.device-btn:active {
+  transform: translateY(0);
+}
+
+/* Device Detail View */
+.device-detail {
+  display: none;
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.device-detail.active {
+  display: block;
+}
+
+.back-btn {
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #667eea;
+  background: white;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.back-btn:hover {
+  background: #667eea;
+  color: white;
+}
+
+.detail-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.detail-header h2 {
+  color: #667eea;
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.status-online {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-offline {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.info-section {
+  margin: 20px 0;
+}
+
+.info-section h3 {
+  color: #333;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #667eea;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  margin: 8px 0;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.info-label {
+  font-weight: bold;
+  color: #555;
+}
+
+.info-value {
+  color: #333;
+}
+
+.data-list {
+  list-style: none;
+}
+
+.data-list li {
+  padding: 10px;
+  margin: 5px 0;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.tab-btn {
+  padding: 12px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tab-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.tab-btn:active {
+  transform: translateY(0);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Chart Container */
+.chart-container {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.tempChart {
+  width: 100%;
+  height: 400px;
+}
+
+/* History Table */
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.history-table th {
+  background: #667eea;
+  color: white;
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+}
+
+.history-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.history-table tr:hover {
+  background: #f8f9fa;
+}
+
+.history-container {
+  max-height: 400px;
+  overflow-y: auto;
+}
+/* Control Table */
+.control-table th {
+  /* background: #667eea; */
+  /* color: white; */
+  padding: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+

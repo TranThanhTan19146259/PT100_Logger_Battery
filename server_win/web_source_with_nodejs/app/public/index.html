@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Guest Book</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+    
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    
+    .form-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    button:hover {
+      background: #45a049;
+    }
+    
+    .message {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .message-name {
+      font-weight: bold;
+      color: #4CAF50;
+    }
+    
+    .message-date {
+      color: #999;
+      font-size: 12px;
+    }
+    
+    .message-text {
+      margin-top: 10px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>📝 Guest Book</h1>
+  
+  <div class="form-box">
+    <h2>Leave a Message</h2>
+    <input type="text" id="name" placeholder="Your Name">
+    <textarea id="message" placeholder="Your Message" rows="3"></textarea>
+    <button onclick="addMessage()">Post Message</button>
+  </div>
+  
+  <div id="messages"></div>
+
+  <script>
+    // Load messages when page opens
+    loadMessages();
+    
+    async function loadMessages() {
+      const response = await fetch('/api/messages');
+      const messages = await response.json();
+      
+      const html = messages.map(m => `
+        <div class="message">
+          <div class="message-name">${m.name}</div>
+          <div class="message-date">${new Date(m.date).toLocaleString()}</div>
+          <div class="message-text">${m.message}</div>
+        </div>
+      `).join('');
+      
+      document.getElementById('messages').innerHTML = html || '<p style="text-align:center; color:#999;">No messages yet. Be the first!</p>';
+    }
+    
+    async function addMessage() {
+      const name = document.getElementById('name').value;
+      const message = document.getElementById('message').value;
+      
+      if (!name || !message) {
+        alert('Please fill in both fields!');
+        return;
+      }
+      
+      await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, message })
+      });
+      
+      document.getElementById('name').value = '';
+      document.getElementById('message').value = '';
+      loadMessages();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+
+  app:
+    image: node:20-alpine
+    container_name: todo_app
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./app:/app
+    command: sh -c "cd /app && ls -la && npm install && node /app/server.js"
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+networks:
+  app-network:
