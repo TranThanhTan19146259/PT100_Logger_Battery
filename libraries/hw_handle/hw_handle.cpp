@@ -124,6 +124,9 @@ void init_hw()
     xTaskCreatePinnedToCore(mqtt_handle_task_code,"mqtt",8096,NULL,1,&MqttTask,1);  delay(50);   
     xTaskCreatePinnedToCore(time_ntp_task_code,"ntp",4096,NULL,1,&GetTimeTask,1);  delay(50);   
     xTaskCreatePinnedToCore(sync_data_task_code,"sync_data",8096,NULL,1,&Sync_data,1);  delay(50);  
+
+    
+
     // initTimeServerLocal();
     // ESP_LOGD(TAG,"DevId:%s SR: %d", myRam.mqtt_config_data.devId.c_str(), myRam.pt100_data.sampleRate);
 
@@ -141,6 +144,14 @@ void handle_hw()
   if (millis() - t_send_data > 1000)
   {
     ESP_LOGD(TAG, "adc: %d", analogRead(ADC_PIN));
+
+    size_t total_bytes = SPIFFS.totalBytes();
+    size_t used_bytes = SPIFFS.usedBytes();
+    size_t free_bytes = total_bytes - used_bytes;
+    
+    Serial.printf("Total: %d bytes\n", total_bytes);
+    Serial.printf("Used: %d bytes\n", used_bytes);
+    Serial.printf("Free: %d bytes\n", free_bytes);
     t_send_data = millis();
   }
   

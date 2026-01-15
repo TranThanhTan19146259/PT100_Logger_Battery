@@ -8355,3 +8355,27 @@
 2026-01-12 10:46:46 [7384] WARN  broker.c:1376: EMQX Edge (ver 1.2.0) Serving HTTP Server on http://0.0.0.0:8081
 2026-01-12 10:46:46 [7384] WARN  broker.c:1458: NanoMQ Broker is started successfully!
 
+2026-01-14 14:30:40 [7384] WARN  mqtt_parser.c:1335: mqtt-explorer-8f78055a online!
+2026-01-14 14:30:43 [7384] WARN  nmq_mqtt.c:986: mqtt-explorer-8f78055a pipe close!
+2026-01-14 14:30:43 [7384] WARN  mqtt_parser.c:1339: mqtt-explorer-8f78055a offline!
+2026-01-14 14:30:43 [7384] WARN  nmq_mqtt.c:431: pipe id 2016390686 is gone, pub failed
+2026-01-14 14:31:00 [7384] WARN  mqtt_parser.c:1335: mqtt-explorer-8f78055a online!
+2026-01-14 14:31:43 [7384] WARN  nmq_mqtt.c:986: mqtt-explorer-8f78055a pipe close!
+2026-01-14 14:31:43 [7384] WARN  mqtt_parser.c:1339: mqtt-explorer-8f78055a offline!
+2026-01-14 14:31:43 [7384] WARN  nmq_mqtt.c:431: pipe id 2016390686 is gone, pub failed
+2026-01-14 14:31:46 [7384] WARN  mqtt_parser.c:1335: mqtt-explorer-8f78055a online!
+2026-01-14 14:33:35 [7384] WARN  mqtt_parser.c:1335: Indr_Pt100_client_NOnfMGTlfNPd online!
+2026-01-14 14:33:47 [7384] WARN  nmq_mqtt.c:986: mqtt-explorer-8f78055a pipe close!
+2026-01-14 14:33:47 [7384] WARN  mqtt_parser.c:1339: mqtt-explorer-8f78055a offline!
+2026-01-14 14:33:47 [7384] WARN  nmq_mqtt.c:431: pipe id 2016390686 is gone, pub failed
+2026-01-14 14:33:52 [7384] WARN  mqtt_parser.c:1335: mqtt-explorer-8f78055a online!
+2026-01-14 14:35:40 [7384] WARN  nmq_websocket.c:160:  recv aio error Object closed
+2026-01-14 14:35:40 [7384] WARN  nmq_mqtt.c:986: Indr_Pt100_client_NOnfMGTlfNPd pipe close!
+2026-01-14 14:35:40 [7384] WARN  mqtt_parser.c:1339: Indr_Pt100_client_NOnfMGTlfNPd offline!
+2026-01-14 14:35:48 [7384] WARN  mqtt_parser.c:1335: Indr_Pt100_client_mIbHRNMv0y2b online!
+2026-01-14 14:39:39 [7384] WARN  nmq_websocket.c:160:  recv aio error Object closed
+2026-01-14 14:39:39 [7384] WARN  nmq_mqtt.c:986: Indr_Pt100_client_mIbHRNMv0y2b pipe close!
+2026-01-14 14:39:39 [7384] WARN  mqtt_parser.c:1339: Indr_Pt100_client_mIbHRNMv0y2b offline!
+2026-01-14 14:46:01 [7384] WARN  nmq_mqtt.c:986: mqtt-explorer-8f78055a pipe close!
+2026-01-14 14:46:01 [7384] WARN  mqtt_parser.c:1339: mqtt-explorer-8f78055a offline!
+2026-01-14 14:46:01 [7384] WARN  nmq_mqtt.c:431: pipe id 2016390686 is gone, pub failed
