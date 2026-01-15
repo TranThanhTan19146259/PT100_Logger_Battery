@@ -6,6 +6,7 @@
 #include "Ram.h"
 #include "flash_read_write.h"
 #include "str_param_def.h"
+#include "sync_data_flash_to_sv.h"
 
 #define MQTT_HOSTNAME "192.168.11.101"
 #define MQTT_PORT     1883

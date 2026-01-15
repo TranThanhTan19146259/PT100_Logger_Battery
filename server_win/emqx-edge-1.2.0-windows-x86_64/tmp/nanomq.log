@@ -8379,3 +8379,160 @@
 2026-01-14 14:46:01 [7384] WARN  nmq_mqtt.c:986: mqtt-explorer-8f78055a pipe close!
 2026-01-14 14:46:01 [7384] WARN  mqtt_parser.c:1339: mqtt-explorer-8f78055a offline!
 2026-01-14 14:46:01 [7384] WARN  nmq_mqtt.c:431: pipe id 2016390686 is gone, pub failed
+2026-01-15 18:09:05 [7384] WARN  mqtt_parser.c:1335: Indr_Pt100_client_50qP7TA163JE online!
+2026-01-15 18:10:36 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 18:11:41 [7384] WARN  nmq_mqtt.c:245: Warning: close pipe & kick client due to KeepAlive timeout!
+2026-01-15 18:11:41 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 18:11:41 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 18:11:41 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 18:11:41 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 18:12:58 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 18:14:58 [7384] ERROR pipe.c:520: Client ID collision or set ID failed!
+2026-01-15 18:14:58 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 18:14:58 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 18:14:58 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 18:14:58 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 18:14:58 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 20:23:23 [7384] WARN  nmq_websocket.c:160:  recv aio error Object closed
+2026-01-15 20:23:23 [7384] WARN  nmq_mqtt.c:986: Indr_Pt100_client_50qP7TA163JE pipe close!
+2026-01-15 20:23:23 [7384] WARN  mqtt_parser.c:1339: Indr_Pt100_client_50qP7TA163JE offline!
+2026-01-15 22:56:26 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Unknown error #212
+
+2026-01-15 22:56:26 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 128
+
+2026-01-15 22:56:26 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 22:56:26 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:23:16 [7384] WARN  mqtt_parser.c:1335: Indr_Pt100_client_oqfMjbfHbWio online!
+2026-01-15 23:24:59 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:25:44 [7384] WARN  nmq_mqtt.c:245: Warning: close pipe & kick client due to KeepAlive timeout!
+2026-01-15 23:25:44 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:25:44 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:25:44 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:25:44 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:27:18 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:27:53 [7384] WARN  nmq_mqtt.c:245: Warning: close pipe & kick client due to KeepAlive timeout!
+2026-01-15 23:27:53 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:27:53 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:27:53 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:27:53 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:30:39 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:31:14 [7384] WARN  nmq_mqtt.c:245: Warning: close pipe & kick client due to KeepAlive timeout!
+2026-01-15 23:31:14 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:31:14 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:31:14 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:31:14 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:31:22 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:32:07 [7384] WARN  nmq_mqtt.c:245: Warning: close pipe & kick client due to KeepAlive timeout!
+2026-01-15 23:32:07 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:32:07 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:32:07 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:32:07 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:35:20 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:36:05 [7384] WARN  nmq_mqtt.c:245: Warning: close pipe & kick client due to KeepAlive timeout!
+2026-01-15 23:36:05 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:36:05 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:36:05 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:36:05 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:36:52 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:39:47 [7384] ERROR pipe.c:520: Client ID collision or set ID failed!
+2026-01-15 23:39:47 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:39:47 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:39:47 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:39:47 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:39:47 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:40:22 [7384] WARN  nmq_mqtt.c:245: Warning: close pipe & kick client due to KeepAlive timeout!
+2026-01-15 23:40:22 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:40:22 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:40:22 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:40:22 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:40:53 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:42:53 [7384] ERROR pipe.c:520: Client ID collision or set ID failed!
+2026-01-15 23:42:53 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:42:53 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:42:53 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:42:53 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:42:53 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:44:09 [7384] ERROR pipe.c:520: Client ID collision or set ID failed!
+2026-01-15 23:44:09 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:44:09 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:44:09 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:44:09 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:44:09 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:45:04 [7384] ERROR pipe.c:520: Client ID collision or set ID failed!
+2026-01-15 23:45:04 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:45:04 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:45:04 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:45:04 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:45:04 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:45:49 [7384] WARN  nmq_mqtt.c:245: Warning: close pipe & kick client due to KeepAlive timeout!
+2026-01-15 23:45:49 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:45:49 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:45:49 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:45:49 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:46:19 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:49:15 [7384] ERROR pipe.c:520: Client ID collision or set ID failed!
+2026-01-15 23:49:15 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:49:15 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:49:15 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:49:15 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:49:15 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:50:30 [7384] WARN  nmq_mqtt.c:245: Warning: close pipe & kick client due to KeepAlive timeout!
+2026-01-15 23:50:30 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:50:30 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:50:30 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:50:30 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:50:58 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:53:04 [7384] ERROR pipe.c:520: Client ID collision or set ID failed!
+2026-01-15 23:53:04 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:53:04 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:53:04 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:53:04 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:53:04 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:55:51 [7384] ERROR pipe.c:520: Client ID collision or set ID failed!
+2026-01-15 23:55:51 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:55:51 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:55:51 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:55:51 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:55:51 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-15 23:56:36 [7384] WARN  nmq_mqtt.c:245: Warning: close pipe & kick client due to KeepAlive timeout!
+2026-01-15 23:56:36 [7384] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-15 23:56:36 [7384] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-15 23:56:36 [7384] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-15 23:56:36 [7384] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-15 23:56:45 [7384] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!

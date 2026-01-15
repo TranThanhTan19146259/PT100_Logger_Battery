@@ -10,6 +10,7 @@ typedef struct PT100_data_t
     uint16_t resistor;
     uint8_t time_get_data;
     uint8_t sampleRate;
+    uint64_t tempTimeRawData; // this data is used for sotring into flash
 } PT100_data;
 
 typedef struct Wifi_config_data
@@ -77,6 +78,28 @@ typedef struct sync_data_sv_backup
     uint32_t mqtt_buff_ptr = 0;;
     state_sync_data_backup_e sync_state;
 }sync_data_sv_backup_t;
+
+
+typedef enum state_sync_FlashData_backup
+{
+    FIRST_STARTUP_FLASH_MEMORY,
+    START_ASSIGN_DATA_TO_FLASH,
+    START_SYNC_FLASH_DATA_TO_SV,
+    WAIT_TO_SEND_FLASH_DATA_TO_SV,
+    START_SEND_FLASH_DATA_TO_SV,
+    CLEAR_FLASH_DATA,
+    DONE_SYNC_FLASH_DATA_TO_SV
+
+} state_sync_FlashData_backup_e;
+
+typedef struct sync_Flashdata_sv_backup
+{
+    uint32_t currentFlashAddr = 0x0000; // get current flash address to detect sector and flash address to write data
+    state_sync_FlashData_backup_e sync_state;
+    uint32_t total_sector_used;
+    uint32_t total_offline_data_stored;
+    uint32_t ptr_buf_flash_offline_data;
+} sync_Flashdata_sv_backup_t;
 
 typedef enum Esp_working_modes{
     ENTER_SLEEP_MODE,
