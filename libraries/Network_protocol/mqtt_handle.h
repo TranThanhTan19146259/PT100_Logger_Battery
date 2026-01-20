@@ -21,11 +21,13 @@
 
 #define PT100_BASE_MQTT_TOPIC         "Indr_PT100"
 #define PT100_MQTT_CONTROL_TOPIC      "control"
+#define PT100_MQTT_RESPONSE_LASTEST_DATA_TOPIC      "responseLastestData"
+#define PT100_MQTT_RESPONSE_HISTORY_DATA_TOPIC      "responseHisData"
 #define PT100_SAMPLE_RATE_CMD         "sampleRate"
 
 #define MQTT_SERVER_TIMEOUT_COUNT 5 
-#define MQTT_MAX_BUFFER 3000
-#define MAX_BUFFER_DATA_POINTS_SEND_TO_SV 30
+#define MQTT_MAX_BUFFER 2048
+#define MAX_BUFFER_DATA_POINTS_SEND_TO_SV 10
 
 
 void initMqtt();
@@ -33,6 +35,7 @@ void reconnectMqtt();
 void connect_to_broker(char* usr,  char* pass);
 void callback(char* topic, byte *payload, unsigned int length);
 void handle_mqtt();
+void mqtt_update_data_task();
 
 void send_data_mqtt(String topic, String jsonData);
 

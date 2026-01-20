@@ -41,6 +41,8 @@ void convertUnixTimeToHumanDate(uint32_t unixTime, struct tm *output_tm)
     
     // Copy the time data to the output pointer
     if (output_tm != NULL && timeinfo != NULL) {
+        timeinfo->tm_year += 1900;
+        timeinfo->tm_mon += 1;
         *output_tm = *timeinfo;
     }
 }
@@ -71,7 +73,7 @@ void save_data_offline_to_flash()
             tempData.marshall = myRam.pt100_data.temp;
             uint32_t unixTimeStamp;
             unixTimeStamp = convertHumanDateToUnixTime(myRam.ntp_time.ntpDateTimeString);
-            ESP_LOGD(TAG, "unix time: %d", unixTimeStamp);
+            // ESP_LOGD(TAG, "unix time: %d", unixTimeStamp);
             convert_data<uint32_t> timeData;
             timeData.marshall = unixTimeStamp;
             convert_data<uint64_t> timeTempData;
@@ -85,7 +87,7 @@ void save_data_offline_to_flash()
             timeTempData.unmarshall[6] = tempData.unmarshall[2];
             timeTempData.unmarshall[7] = tempData.unmarshall[3];
             // flash.readAnything(myRam.flashData_sync.currentFlashAddr, U64_data_R);
-            ESP_LOGD(TAG, "data W = 0x%016" PRIx64, timeTempData.marshall);
+            // ESP_LOGD(TAG, "data W = 0x%016" PRIx64, timeTempData.marshall);
             
             if (!flash.writeAnything(myRam.flashData_sync.currentFlashAddr, timeTempData.marshall))
             {
@@ -96,11 +98,11 @@ void save_data_offline_to_flash()
                 uint64_t timeTempDataRaw;
 
                 flash.readAnything(myRam.flashData_sync.currentFlashAddr, timeTempDataRaw);
-                ESP_LOGD(TAG, "Data R = 0x%016" PRIx64, timeTempDataRaw);
+                // ESP_LOGD(TAG, "Data R = 0x%016" PRIx64, timeTempDataRaw);
 
             }
             //  flash.writeAnything(myRam.flashData_sync.currentFlashAddr, timeTempData.marshall);
-            ESP_LOGD(TAG, "addr stored: %x", myRam.flashData_sync.currentFlashAddr);
+            // ESP_LOGD(TAG, "addr stored: %x", myRam.flashData_sync.currentFlashAddr);
             myRam.flashData_sync.currentFlashAddr += 8;
         }
         else
@@ -150,7 +152,7 @@ void handle_sync_flashData()
             {
                 myRam.flashData_sync.total_offline_data_stored = (myRam.flashData_sync.currentFlashAddr) / 8;
                 myRam.flashData_sync.total_sector_used = (myRam.flashData_sync.currentFlashAddr) / SECTOR_SIZE;
-                ESP_LOGD(TAG, "total data stored: %d", myRam.flashData_sync.total_offline_data_stored);
+                // ESP_LOGD(TAG, "total data stored: %d", myRam.flashData_sync.total_offline_data_stored);
                 myRam.flashData_sync.sync_state = START_SEND_FLASH_DATA_TO_SV;
                 // myRam.flashData_sync.currentFlashAddr = 0;
             }
@@ -165,7 +167,7 @@ void handle_sync_flashData()
         }
     case WAIT_TO_SEND_FLASH_DATA_TO_SV:
         {
-            if (millis() - t_sync_flash_data > 200)
+            if (millis() - t_sync_flash_data > 1000)
             {
                 myRam.flashData_sync.sync_state = START_SEND_FLASH_DATA_TO_SV;
                 t_sync_flash_data = millis();

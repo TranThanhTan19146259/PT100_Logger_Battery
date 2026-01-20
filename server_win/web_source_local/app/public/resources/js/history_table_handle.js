@@ -1,5 +1,33 @@
 let count_req_times = 0;
 
+function parseDate(dateStr) {
+    // "19/01/2026 14:10:57"
+    const [datePart, timePart] = dateStr.split(" ");
+    const [day, month, year] = datePart.split("/").map(Number);
+    const [hour, min, sec] = timePart.split(":").map(Number);
+
+    return new Date(year, month - 1, day, hour, min, sec);
+}
+
+function sort_table() {
+    const tbody = document.getElementById("historyTableBody");
+    const rows = Array.from(tbody.rows);
+
+    // 1️⃣ Sort by Time column (ASC)
+    rows.sort((a, b) => {
+        const timeA = parseDate(a.cells[1].innerText);
+        const timeB = parseDate(b.cells[1].innerText);
+        return timeA - timeB;
+    });
+
+    // 2️⃣ Re-append rows + re-number No column
+    rows.forEach((row, index) => {
+        row.cells[0].innerText = index + 1; // No: 1,2,3...
+        tbody.appendChild(row);
+    });
+}
+
+
 function generate_history_table()
 {
     // get a reference to his_table
@@ -104,8 +132,8 @@ function update_history_table(inputData)
             tempCell.appendChild(tempText);
         }
     }
-    
-    // update_new_data_to_database();
+    // re-arrange history table after getting data from device
+    sort_table();
 }
 
 function remove_history_table()

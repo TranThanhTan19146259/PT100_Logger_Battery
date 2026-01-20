@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Device Manager</title>
@@ -15,7 +15,7 @@
     <script src="resources/js/db_server_infor.js"></script>
     <script src="resources/js/chart_lib/dist/chart.umd.min.js"></script>
     <!-- Then load your custom chart file -->
-    <script src="/resources/js/chart_handle.js"></script>
+    <script src="/resources/js/chart_handle.js"></script> 
     <script src="/resources/js/device_manager.js"></script>
     <script src="/resources/js/history_table_handle.js"></script>
     <script src="/resources/js/db_handle.js"></script>
@@ -72,7 +72,7 @@
         <!-- Tab Navigation -->
         <div class="tab-navigation">
             <button class="tab-btn active" onclick="switchTab('chart')">Chart</button>
-            <button class="tab-btn" onclick="switchTab('history')">History</button>
+            <button class="tab-btn" onclick="switchTab('history'); sort_table()">History</button>
             <button class="tab-btn" onclick="switchTab('control')" >Control</button>
         </div>
 

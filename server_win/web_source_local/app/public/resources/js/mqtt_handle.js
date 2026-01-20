@@ -94,7 +94,7 @@ function connectMQTT() {
                 }
                 if(lastestDataFromDevices == "control")
                 {
-                    handle_data_response_from_devices(deviceId,message);
+                    // handle_data_response_from_devices(deviceId,message);
                 }
             } catch (e) {
                 console.error('Error parsing MQTT message:', e);

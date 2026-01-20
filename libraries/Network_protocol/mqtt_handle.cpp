@@ -47,7 +47,7 @@ void callback(char* topic, byte *payload, unsigned int length)
           if (error) {
             Serial.print(F("deserializeJson() failed: "));
             Serial.println(error.f_str());
-            return;
+            // return;
           }
           const char* cmd = doc["cmd"]; // "sampleRate"
           int value = doc["value"]; // 50
@@ -74,6 +74,35 @@ void callback(char* topic, byte *payload, unsigned int length)
           
           
         }
+        if (memcmp(buf[2], PT100_MQTT_RESPONSE_HISTORY_DATA_TOPIC, strlen(PT100_MQTT_RESPONSE_HISTORY_DATA_TOPIC)) == 0)
+        {
+          String payload_str;
+          for (uint8_t i = 0; i < length; i++)
+          {
+            payload_str += (char)payload[i];
+          }
+          Serial.println(payload_str); 
+          StaticJsonDocument<32> doc;
+
+          DeserializationError error = deserializeJson(doc, payload_str);
+
+          if (error) {
+            Serial.print(F("deserializeJson() failed: "));
+            Serial.println(error.f_str());
+            // return;
+          }
+          else
+          {
+            const char* status = doc["status"]; // "ok" // check this status come from device or server, 
+                                                        // this status will be sent from server to ensure correct msg when device start 
+                                                        // synchronizing offline/online data 
+            if (status != nullptr || *status != '\0') // has status responsed  from server
+            {
+              ESP_LOGD(TAG,"server response lastest data oke!");
+              myRam.flashData_sync.response_from_server = 1;
+            }
+          }
+        }
       }
       
       
@@ -83,6 +112,18 @@ void callback(char* topic, byte *payload, unsigned int length)
 
 }
 bool isConnectedBroker;
+
+
+void mqtt_update_data_task() 
+{
+  if (isConnectedBroker == 1)
+  {
+    // char buf_sub_topic[100];
+    // sprintf(buf_sub_topic,"%s/%s/lastestData",PT100_BASE_MQTT_TOPIC, myRam.mqtt_config_data.devId.c_str());
+    // client.subscribe(buf_sub_topic);
+  }
+  
+}
 
 void connect_to_broker(char *usr, char *pass)
 {
@@ -100,7 +141,9 @@ void connect_to_broker(char *usr, char *pass)
       disc_to_sv_counter = 0;
       Serial.println("connected");
       char buf_sub_topic[100];
-      sprintf(buf_sub_topic,"%s/%s/control",PT100_BASE_MQTT_TOPIC, myRam.mqtt_config_data.devId.c_str());
+      sprintf(buf_sub_topic,"%s/%s/%s",PT100_BASE_MQTT_TOPIC, myRam.mqtt_config_data.devId.c_str(), PT100_MQTT_CONTROL_TOPIC);
+      client.subscribe(buf_sub_topic);
+      sprintf(buf_sub_topic,"%s/%s/%s",PT100_BASE_MQTT_TOPIC, myRam.mqtt_config_data.devId.c_str(), PT100_MQTT_RESPONSE_HISTORY_DATA_TOPIC);
       client.subscribe(buf_sub_topic);
 
     }
@@ -205,6 +248,96 @@ void convert_flashData_to_timeTempData(uint32_t addr, float &tempDataOuput, Stri
     // ESP_LOGD(TAG,"temp: %.2f time: %s", tempData.marshall, timeDataOutput.c_str());
 }
 
+void mqtt_sync_flash_data_to_sv()
+{
+  switch (myRam.flashData_sync.sync_state)
+  {
+    case START_SEND_FLASH_DATA_TO_SV:
+    {           
+      ESP_LOGD(TAG, "START_SEND_FLASH_DATA_TO_SV");
+      //generate json string to send to thingsboard
+      StaticJsonDocument<MQTT_MAX_BUFFER> doc_temp_time;
+      // ESP_LOGD(TAG, "length data: %d", myRam.data_sync.temp_ptr);
+      JsonArray temp_his = doc_temp_time.createNestedArray("temp_his");
+      JsonArray time_his = doc_temp_time.createNestedArray("time_his");
+      // doc_temp_time["sync_flag"] = 1;
+      if (myRam.flashData_sync.total_offline_data_stored > MAX_BUFFER_DATA_POINTS_SEND_TO_SV)
+      {
+        // static uint32_t temp_buf_flash_offline = myRam.flashData_sync.ptr_buf_flash_offline_data;
+        for (uint16_t i = 0; i < MAX_BUFFER_DATA_POINTS_SEND_TO_SV; i++)
+        {
+          float tempFlashData;
+          String timeFlashData;
+          convert_flashData_to_timeTempData(myRam.flashData_sync.ptr_buf_flash_offline_data * 8, tempFlashData, timeFlashData);
+          temp_his.add(tempFlashData);
+          time_his.add(timeFlashData);
+          myRam.flashData_sync.ptr_buf_flash_offline_data ++;
+          // ESP_LOGD(TAG, "i: %dMAX_BUFFER_DATA_POINTS_SEND_TO_SV %d",i, MAX_BUFFER_DATA_POINTS_SEND_TO_SV);
+        }
+        ESP_LOGD(TAG, "SEND DATA!!!! OVER");
+        String output_time_temp;
+        serializeJson(doc_temp_time, output_time_temp);
+        Serial.println(output_time_temp);
+        String mqtt_topic_data = "Indr_PT100/" + myRam.mqtt_config_data.devId + "/hisData";
+        send_data_mqtt(mqtt_topic_data, output_time_temp);
+        if (myRam.flashData_sync.response_from_server == 1)
+        {
+          myRam.flashData_sync.total_offline_data_stored -= MAX_BUFFER_DATA_POINTS_SEND_TO_SV;
+          myRam.flashData_sync.response_from_server = 0;
+        }
+        else
+        {
+          // ESP_LOGD(TAG, "dont recev response from server");
+          if (myRam.flashData_sync.ptr_buf_flash_offline_data != 0)
+          {
+            myRam.flashData_sync.ptr_buf_flash_offline_data -= MAX_BUFFER_DATA_POINTS_SEND_TO_SV;
+          }
+          
+        }
+        myRam.flashData_sync.sync_state = START_SYNC_FLASH_DATA_TO_SV;
+      }
+      else
+      {
+        for (uint16_t i = 0; i < myRam.flashData_sync.total_offline_data_stored; i++)
+        {
+          float tempFlashData;
+          String timeFlashData;
+          convert_flashData_to_timeTempData(myRam.flashData_sync.ptr_buf_flash_offline_data * 8, tempFlashData, timeFlashData);
+          temp_his.add(tempFlashData);
+          time_his.add(timeFlashData);
+          myRam.flashData_sync.ptr_buf_flash_offline_data ++;
+          // myRam.data_sync.mqtt_buff_ptr++;
+        }
+        ESP_LOGD(TAG, "SEND DATA!!!! UNDER");
+        String output_time_temp;
+        serializeJson(doc_temp_time, output_time_temp);
+        Serial.println(output_time_temp);
+        String mqtt_topic_data = "Indr_PT100/" + myRam.mqtt_config_data.devId + "/hisData";
+        send_data_mqtt(mqtt_topic_data, output_time_temp);
+        if (myRam.flashData_sync.response_from_server == 1)
+        {
+          ESP_LOGD(TAG, "clear data");
+          myRam.flashData_sync.sync_state = CLEAR_FLASH_DATA;
+          myRam.flashData_sync.response_from_server = 0;
+        }
+        else
+        {
+          ESP_LOGD(TAG, "dont recev response from server %d", myRam.flashData_sync.ptr_buf_flash_offline_data);
+          if (myRam.flashData_sync.ptr_buf_flash_offline_data != 0)
+          {
+            myRam.flashData_sync.ptr_buf_flash_offline_data -= myRam.flashData_sync.total_offline_data_stored;
+          }
+          myRam.flashData_sync.sync_state = START_SYNC_FLASH_DATA_TO_SV;
+        }
+      }
+      
+      break;
+
+  }
+  default:
+    break;
+  }
+}
 
 void handle_mqtt()
 {
@@ -213,6 +346,7 @@ void handle_mqtt()
   static uint32_t t_bk_data = 0;
   static uint8_t state_generate_buf_temp_time_bk;  
   // if ((isConnectedBroker == 0 || myRam.wifi_config_data.is_wifi_connected == 0) && myRam.localServer_time.get_time_ok == 1) // use this condition for local server time
+  mqtt_sync_flash_data_to_sv();
   if ((isConnectedBroker == 0 || myRam.wifi_config_data.is_wifi_connected == 0) && myRam.ntp_time.get_time_ok == 1) // use this condition for ntp server time
   {
     myRam.mqtt_config_data.isConnectToBroker = 0;
@@ -220,121 +354,16 @@ void handle_mqtt()
     myRam.flashData_sync.sync_state = START_ASSIGN_DATA_TO_FLASH;
   }
   if (millis() - t_send_data > myRam.pt100_data.sampleRate * 1000)
-  {
+  { 
+    ESP_LOGD(TAG, "STATE %d", myRam.flashData_sync.sync_state);
     if (isConnectedBroker == 1)
     {
       if (myRam.working_status.esp_working_modes == ACTIVE_MODE)
       {
         myRam.mqtt_config_data.isConnectToBroker = 1;
-        switch (myRam.flashData_sync.sync_state)
-        {
-          case START_SEND_FLASH_DATA_TO_SV:
-          {           
-            //generate json string to send to thingsboard
-            StaticJsonDocument<MQTT_MAX_BUFFER> doc_temp_time;
-            // ESP_LOGD(TAG, "length data: %d", myRam.data_sync.temp_ptr);
-            JsonArray temp_his = doc_temp_time.createNestedArray("temp_his");
-            JsonArray time_his = doc_temp_time.createNestedArray("time_his");
-            // doc_temp_time["sync_flag"] = 1;
-            if (myRam.flashData_sync.total_offline_data_stored > MAX_BUFFER_DATA_POINTS_SEND_TO_SV)
-            {
-              for (uint16_t i = 0; i < MAX_BUFFER_DATA_POINTS_SEND_TO_SV; i++)
-              {
-                float tempFlashData;
-                String timeFlashData;
-                convert_flashData_to_timeTempData(myRam.flashData_sync.ptr_buf_flash_offline_data * 8, tempFlashData, timeFlashData);
-                temp_his.add(tempFlashData);
-                time_his.add(timeFlashData);
-                myRam.flashData_sync.ptr_buf_flash_offline_data ++;
-              }
-              ESP_LOGD(TAG, "SEND DATA!!!! OVER");
-              String output_time_temp;
-              serializeJson(doc_temp_time, output_time_temp);
-              Serial.println(output_time_temp);
-              String mqtt_topic_data = "Indr_PT100/" + myRam.mqtt_config_data.devId + "/lastestData";
-              send_data_mqtt(mqtt_topic_data, output_time_temp);
-              myRam.flashData_sync.total_offline_data_stored -= MAX_BUFFER_DATA_POINTS_SEND_TO_SV;
-            }
-            else
-            {
-              for (uint16_t i = 0; i < myRam.flashData_sync.total_offline_data_stored; i++)
-              {
-                float tempFlashData;
-                String timeFlashData;
-                convert_flashData_to_timeTempData(myRam.flashData_sync.ptr_buf_flash_offline_data * 8, tempFlashData, timeFlashData);
-                temp_his.add(tempFlashData);
-                time_his.add(timeFlashData);
-                myRam.flashData_sync.ptr_buf_flash_offline_data ++;
-                // myRam.data_sync.mqtt_buff_ptr++;
-              }
-              ESP_LOGD(TAG, "SEND DATA!!!! UNDER");
-              String output_time_temp;
-              serializeJson(doc_temp_time, output_time_temp);
-              Serial.println(output_time_temp);
-              String mqtt_topic_data = "Indr_PT100/" + myRam.mqtt_config_data.devId + "/lastestData";
-              send_data_mqtt(mqtt_topic_data, output_time_temp);
-              myRam.flashData_sync.sync_state = CLEAR_FLASH_DATA;
-            }
-            break;
-        }
-        default:
-          break;
-        }
-
-        // switch (myRam.data_sync.sync_state)
-        // {
-        // case START_SEND_RAM_DATA_TO_SV:
-        // {
-        //   //generate json string to send to thingsboard
-        //   StaticJsonDocument<MQTT_MAX_BUFFER> doc_temp_time;
-        //   ESP_LOGD(TAG, "length data: %d", myRam.data_sync.temp_ptr);
-        //   JsonArray temp_his = doc_temp_time.createNestedArray("temp_his");
-        //   JsonArray time_his = doc_temp_time.createNestedArray("time_his");
-        //   // doc_temp_time["sync_flag"] = 1;
-        //   if (myRam.data_sync.temp_ptr > MAX_BUFFER_DATA_POINTS_SEND_TO_SV)
-        //   {
-        //     for (uint16_t i = 0; i < MAX_BUFFER_DATA_POINTS_SEND_TO_SV; i++)
-        //     {
-        //       temp_his.add(myRam.data_sync.buf_temp[i + myRam.data_sync.mqtt_buff_ptr]);
-        //       time_his.add(myRam.data_sync.buf_time[i + myRam.data_sync.mqtt_buff_ptr]);
-        //       Serial.print(myRam.data_sync.mqtt_buff_ptr + i);
-        //       Serial.print("|");
-        //     }
-        //     myRam.data_sync.mqtt_buff_ptr += MAX_BUFFER_DATA_POINTS_SEND_TO_SV;
-        //     ESP_LOGD(TAG, "SEND DATA!!!! OVER");
-        //     String output_time_temp;
-        //     serializeJson(doc_temp_time, output_time_temp);
-        //     Serial.println(output_time_temp);
-        //     String mqtt_topic_data = "Indr_PT100/" + myRam.mqtt_config_data.devId + "/lastestData";
-        //     // send_data_mqtt(mqtt_topic_data, output_time_temp);
-        //     myRam.data_sync.temp_ptr -= MAX_BUFFER_DATA_POINTS_SEND_TO_SV;
-        //     myRam.data_sync.sync_state = START_SYNC_RAM_DATA_TO_SV;
-        //   }
-        //   else
-        //   {
-        //     for (uint16_t i = 0; i < myRam.data_sync.temp_ptr; i++)
-        //     {
-        //       temp_his.add(myRam.data_sync.buf_temp[i + myRam.data_sync.mqtt_buff_ptr]);
-        //       time_his.add(myRam.data_sync.buf_time[i + myRam.data_sync.mqtt_buff_ptr]);
-        //       // myRam.data_sync.mqtt_buff_ptr++;
-        //     }
-        //     ESP_LOGD(TAG, "SEND DATA!!!! UNDER");
-        //     String output_time_temp;
-        //     serializeJson(doc_temp_time, output_time_temp);
-        //     Serial.println(output_time_temp);
-        //     String mqtt_topic_data = "Indr_PT100/" + myRam.mqtt_config_data.devId + "/lastestData";
-        //     // send_data_mqtt(mqtt_topic_data, output_time_temp);
-        //     myRam.data_sync.sync_state = CLEAR_RAM_DATA;
-        //   }
-        //   break;
-        // }
-        // default:
-        //   break;
-        // }
-        // // if (myRam.localServer_time.get_time_ok == 1 && (myRam.data_sync.sync_state == FIRST_STARTUP_MEMORY || myRam.data_sync.sync_state == DONE_SYNC_RAM_DATA_TO_SV))
         
-        
-        if (myRam.ntp_time.get_time_ok == 1 && (myRam.flashData_sync.sync_state == FIRST_STARTUP_FLASH_MEMORY || myRam.flashData_sync.sync_state == DONE_SYNC_FLASH_DATA_TO_SV)) // use this condition for ntp server time
+        // if (myRam.ntp_time.get_time_ok == 1 && (myRam.flashData_sync.sync_state == FIRST_STARTUP_FLASH_MEMORY || myRam.flashData_sync.sync_state == DONE_SYNC_FLASH_DATA_TO_SV)) // use this condition for ntp server time
+        if (myRam.ntp_time.get_time_ok == 1) // use this condition for ntp server time
         {
           String output;
           StaticJsonDocument<512> doc;

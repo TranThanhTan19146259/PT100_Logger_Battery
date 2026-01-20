@@ -3,6 +3,7 @@ TaskHandle_t MqttTask;
 TaskHandle_t GetTimeTask;  
 TaskHandle_t Sync_data;
 TaskHandle_t Sync_FlashData;
+TaskHandle_t MqttLastestDataUpdateTask;
 
 Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 13, 12, 14); // ESP32 
 
@@ -114,6 +115,15 @@ void sync_data_task_code(void *parameter)
   
 }
 
+// void mqtt_lastest_data_update_task_code(void *parameter)
+// {
+//   while (1)
+//   {
+//     mqtt_update_data_task();
+//   }
+  
+// }
+
 void init_hw()
 {
     EEPROM.begin(10);
@@ -133,6 +143,7 @@ void init_hw()
     thermo.begin(MAX31865_3WIRE);  // set to 2WIRE or 4WIRE as necessary
     // init_Ntp();
     xTaskCreatePinnedToCore(mqtt_handle_task_code,"mqtt",8096,NULL,1,&MqttTask,1);  delay(50);   
+    // xTaskCreatePinnedToCore(mqtt_lastest_data_update_task_code,"mqttLastDataUpdate",8096,NULL,1,&MqttLastestDataUpdateTask,1);  delay(50);   
     xTaskCreatePinnedToCore(time_ntp_task_code,"ntp",4096,NULL,1,&GetTimeTask,1);  delay(50);   
     xTaskCreatePinnedToCore(sync_data_task_code,"sync_data",8096,NULL,1,&Sync_data,1);  delay(50);  
     xTaskCreatePinnedToCore(sync_FlashData_task_code,"sync_flash_data",8096,NULL,1,&Sync_FlashData,1);  delay(50);  

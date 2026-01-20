@@ -37,6 +37,12 @@ typedef struct Mqtt_config_data
     String devId;
 } Mqtt_config_data_t;
 
+typedef struct rtc_time{
+    bool sync_time; // this flag is used to sync time between rtc and ntp time
+
+
+} Rtc_time_t;
+
 typedef struct ntp_time
 {
     String ntpTimeString;
@@ -99,6 +105,7 @@ typedef struct sync_Flashdata_sv_backup
     uint32_t total_sector_used;
     uint32_t total_offline_data_stored;
     uint32_t ptr_buf_flash_offline_data;
+    bool response_from_server = 0;
 } sync_Flashdata_sv_backup_t;
 
 typedef enum Esp_working_modes{
