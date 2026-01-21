@@ -74,6 +74,35 @@ void callback(char* topic, byte *payload, unsigned int length)
           
           
         }
+        if (memcmp(buf[2], PT100_MQTT_RESPONSE_LASTEST_DATA_TOPIC, strlen(PT100_MQTT_RESPONSE_LASTEST_DATA_TOPIC)) == 0)
+        {
+          String payload_str;
+          for (uint8_t i = 0; i < length; i++)
+          {
+            payload_str += (char)payload[i];
+          }
+          Serial.println(payload_str); 
+          StaticJsonDocument<32> doc;
+
+          DeserializationError error = deserializeJson(doc, payload_str);
+
+          if (error) {
+            Serial.print(F("deserializeJson() failed: "));
+            Serial.println(error.f_str());
+            // return;
+          }
+          else
+          {
+            const char* status = doc["status"]; // "ok" // check this status come from device or server, 
+                                                        // this status will be sent from server to ensure correct msg when device start 
+                                                        // synchronizing offline/online data 
+            if (status != nullptr || *status != '\0') // has status responsed  from server
+            {
+              // ESP_LOGD(TAG,"server response lastest data oke!");
+              myRam.flashData_sync.response_from_server_for_lastestData = 1;
+            }
+          }
+        }
         if (memcmp(buf[2], PT100_MQTT_RESPONSE_HISTORY_DATA_TOPIC, strlen(PT100_MQTT_RESPONSE_HISTORY_DATA_TOPIC)) == 0)
         {
           String payload_str;
@@ -98,7 +127,7 @@ void callback(char* topic, byte *payload, unsigned int length)
                                                         // synchronizing offline/online data 
             if (status != nullptr || *status != '\0') // has status responsed  from server
             {
-              ESP_LOGD(TAG,"server response lastest data oke!");
+              // ESP_LOGD(TAG,"server response lastest data oke!");
               myRam.flashData_sync.response_from_server = 1;
             }
           }
@@ -253,9 +282,7 @@ void mqtt_sync_flash_data_to_sv()
   switch (myRam.flashData_sync.sync_state)
   {
     case START_SEND_FLASH_DATA_TO_SV:
-    {           
-      ESP_LOGD(TAG, "START_SEND_FLASH_DATA_TO_SV");
-      //generate json string to send to thingsboard
+    {
       StaticJsonDocument<MQTT_MAX_BUFFER> doc_temp_time;
       // ESP_LOGD(TAG, "length data: %d", myRam.data_sync.temp_ptr);
       JsonArray temp_his = doc_temp_time.createNestedArray("temp_his");
@@ -268,10 +295,10 @@ void mqtt_sync_flash_data_to_sv()
         {
           float tempFlashData;
           String timeFlashData;
-          convert_flashData_to_timeTempData(myRam.flashData_sync.ptr_buf_flash_offline_data * 8, tempFlashData, timeFlashData);
+          convert_flashData_to_timeTempData(myRam.flashData_sync.flashAddrHead, tempFlashData, timeFlashData);
           temp_his.add(tempFlashData);
           time_his.add(timeFlashData);
-          myRam.flashData_sync.ptr_buf_flash_offline_data ++;
+          myRam.flashData_sync.flashAddrHead += 8;
           // ESP_LOGD(TAG, "i: %dMAX_BUFFER_DATA_POINTS_SEND_TO_SV %d",i, MAX_BUFFER_DATA_POINTS_SEND_TO_SV);
         }
         ESP_LOGD(TAG, "SEND DATA!!!! OVER");
@@ -282,17 +309,15 @@ void mqtt_sync_flash_data_to_sv()
         send_data_mqtt(mqtt_topic_data, output_time_temp);
         if (myRam.flashData_sync.response_from_server == 1)
         {
-          myRam.flashData_sync.total_offline_data_stored -= MAX_BUFFER_DATA_POINTS_SEND_TO_SV;
+
           myRam.flashData_sync.response_from_server = 0;
         }
         else
         {
-          // ESP_LOGD(TAG, "dont recev response from server");
-          if (myRam.flashData_sync.ptr_buf_flash_offline_data != 0)
+          if (myRam.flashData_sync.flashAddrHead != 0)
           {
-            myRam.flashData_sync.ptr_buf_flash_offline_data -= MAX_BUFFER_DATA_POINTS_SEND_TO_SV;
+            myRam.flashData_sync.flashAddrHead -= 8 * MAX_BUFFER_DATA_POINTS_SEND_TO_SV;
           }
-          
         }
         myRam.flashData_sync.sync_state = START_SYNC_FLASH_DATA_TO_SV;
       }
@@ -302,10 +327,11 @@ void mqtt_sync_flash_data_to_sv()
         {
           float tempFlashData;
           String timeFlashData;
-          convert_flashData_to_timeTempData(myRam.flashData_sync.ptr_buf_flash_offline_data * 8, tempFlashData, timeFlashData);
+          convert_flashData_to_timeTempData(myRam.flashData_sync.flashAddrHead, tempFlashData, timeFlashData);
           temp_his.add(tempFlashData);
           time_his.add(timeFlashData);
-          myRam.flashData_sync.ptr_buf_flash_offline_data ++;
+          myRam.flashData_sync.flashAddrHead += 8;
+          // myRam.flashData_sync.ptr_buf_flash_offline_data ++;
           // myRam.data_sync.mqtt_buff_ptr++;
         }
         ESP_LOGD(TAG, "SEND DATA!!!! UNDER");
@@ -322,21 +348,58 @@ void mqtt_sync_flash_data_to_sv()
         }
         else
         {
-          ESP_LOGD(TAG, "dont recev response from server %d", myRam.flashData_sync.ptr_buf_flash_offline_data);
-          if (myRam.flashData_sync.ptr_buf_flash_offline_data != 0)
+          ESP_LOGD(TAG, "dont recev response from server %d", myRam.flashData_sync.flashAddrHead);
+          if (myRam.flashData_sync.flashAddrHead != 0)
           {
-            myRam.flashData_sync.ptr_buf_flash_offline_data -= myRam.flashData_sync.total_offline_data_stored;
+            myRam.flashData_sync.flashAddrHead -= (myRam.flashData_sync.total_offline_data_stored * 8);
           }
+          
           myRam.flashData_sync.sync_state = START_SYNC_FLASH_DATA_TO_SV;
         }
       }
-      
       break;
-
-  }
+    }
   default:
     break;
   }
+  // static bool is_data_remaining = 0;
+  if (myRam.mqtt_config_data.isConnectToBroker == 1)
+  {
+    if (myRam.flashData_sync.sync_state == FIRST_STARTUP_FLASH_MEMORY || myRam.flashData_sync.sync_state == DONE_SYNC_FLASH_DATA_TO_SV)
+    {
+      if (myRam.flashData_sync.total_offline_data_stored != 0)
+      {
+        ESP_LOGD(TAG, "data remaining");
+        myRam.flashData_sync.sync_state = START_SEND_FLASH_DATA_TO_SV; // sync data after power off and data is still remaining inside flash
+      }
+      else
+      {
+        // ESP_LOGD(TAG, "flash empty");
+      }
+    }
+    
+  }
+  // {
+  //   if (is_data_remaining == 0)
+  //   {
+  //     if (myRam.flashData_sync.total_offline_data_stored != 0) // data is remaining
+  //     {
+  //       myRam.flashData_sync.sync_state = START_SYNC_FLASH_DATA_TO_SV;
+  //       ESP_LOGD(TAG, "DATA REMAINING!!!!");
+  //       is_data_remaining = 1;
+  //     }
+  //     else
+  //     {
+
+  //     }
+  //   }
+    
+  // }
+  // else
+  // {
+  //   is_data_remaining = 0;
+  // }
+  
 }
 
 void handle_mqtt()
@@ -356,15 +419,37 @@ void handle_mqtt()
   if (millis() - t_send_data > myRam.pt100_data.sampleRate * 1000)
   { 
     ESP_LOGD(TAG, "STATE %d", myRam.flashData_sync.sync_state);
+    ESP_LOGD(TAG, "headAddr %d tailAddr %d total %d", myRam.flashData_sync.flashAddrHead, myRam.flashData_sync.flashAddrTail, myRam.flashData_sync.total_offline_data_stored);
     if (isConnectedBroker == 1)
     {
       if (myRam.working_status.esp_working_modes == ACTIVE_MODE)
       {
         myRam.mqtt_config_data.isConnectToBroker = 1;
+
+
+        
         
         // if (myRam.ntp_time.get_time_ok == 1 && (myRam.flashData_sync.sync_state == FIRST_STARTUP_FLASH_MEMORY || myRam.flashData_sync.sync_state == DONE_SYNC_FLASH_DATA_TO_SV)) // use this condition for ntp server time
+        // if (myRam.flashData_sync.total_offline_data_stored !=)
+        // {
+        //   myRam.
+        // }
+        
         if (myRam.ntp_time.get_time_ok == 1) // use this condition for ntp server time
         {
+          if (myRam.flashData_sync.response_from_server_for_lastestData == 1)
+          {
+            myRam.flashData_sync.response_from_server_for_lastestData = 0;
+          }
+          else
+          {
+            // if (myRam.flashData_sync.sync_state)
+            // {
+            //   /* code */
+            // }
+            save_offline_data();
+            // myRam.flashData_sync.sync_state = START_ASSIGN_DATA_TO_FLASH; // when device doesn't receive response data from sv => write it to flash
+          }
           String output;
           StaticJsonDocument<512> doc;
           doc["mac"] = myRam.wifi_config_data.MAC_Address;
@@ -380,6 +465,8 @@ void handle_mqtt()
           Serial.println(output);
           String mqtt_topic_data = "Indr_PT100/" + myRam.mqtt_config_data.devId + "/lastestData";
           send_data_mqtt(mqtt_topic_data, output);
+          
+          
         }
       }
       

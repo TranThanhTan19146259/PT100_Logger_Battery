@@ -1,0 +1,8 @@
+#pragma once
+
+#include <EEPROM.h>
+
+#define EEPROM_SLEEP_TIME_ADDR 0
+#define EEPROM_SAMPLE_RATE_ADDR 1
+#define EEPROM_HEAD_FLASH_ADDR_OFFSET 2
+#define EEPROM_TAIL_FLASH_ADDR_OFFSET 6

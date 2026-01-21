@@ -94,18 +94,21 @@ typedef enum state_sync_FlashData_backup
     WAIT_TO_SEND_FLASH_DATA_TO_SV,
     START_SEND_FLASH_DATA_TO_SV,
     CLEAR_FLASH_DATA,
+    WAIT_FOR_CLEARING_FLASH_DATA,
     DONE_SYNC_FLASH_DATA_TO_SV
 
 } state_sync_FlashData_backup_e;
 
 typedef struct sync_Flashdata_sv_backup
 {
-    uint32_t currentFlashAddr = 0x0000; // get current flash address to detect sector and flash address to write data
+    uint32_t flashAddrTail = 0x0000; // get current flash address to detect sector and flash address to write data
+    uint32_t flashAddrHead = 0x0000; // get current flash address to detect sector and flash address to write data
     state_sync_FlashData_backup_e sync_state;
     uint32_t total_sector_used;
-    uint32_t total_offline_data_stored;
+    uint64_t total_offline_data_stored;
     uint32_t ptr_buf_flash_offline_data;
-    bool response_from_server = 0;
+    bool response_from_server = 0; // offline data stream
+    bool response_from_server_for_lastestData = 0; // online data stream
 } sync_Flashdata_sv_backup_t;
 
 typedef enum Esp_working_modes{
