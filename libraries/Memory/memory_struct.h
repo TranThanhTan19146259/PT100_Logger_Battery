@@ -37,11 +37,13 @@ typedef struct Mqtt_config_data
     String devId;
 } Mqtt_config_data_t;
 
-typedef struct rtc_time{
-    bool sync_time; // this flag is used to sync time between rtc and ntp time
-
-
-} Rtc_time_t;
+typedef enum Mqtt_state
+{
+    FIRST_START_UP,
+    SENT_DATA_TO_SV,
+    WAIT_FOR_DATA_RESPONSE,
+    DONE_HANDLE_SENT_MSG,
+} Mqtt_state_e;
 
 typedef struct ntp_time
 {
@@ -110,6 +112,15 @@ typedef struct sync_Flashdata_sv_backup
     bool response_from_server = 0; // offline data stream
     bool response_from_server_for_lastestData = 0; // online data stream
 } sync_Flashdata_sv_backup_t;
+
+typedef struct Rtc_time
+{
+    String rtcTimeString;
+    String rtcDateString;
+    String rtcDateTimeString;
+    struct tm rtcTime;
+    bool init_ok;
+} Rtc_time_t;
 
 typedef enum Esp_working_modes{
     ENTER_SLEEP_MODE,

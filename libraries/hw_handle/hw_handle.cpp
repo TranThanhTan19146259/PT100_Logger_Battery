@@ -9,7 +9,6 @@ Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 13, 12, 14); // ESP32
 
 void control_sleep_mode()
 {
-
   if (myRam.working_status.esp_working_modes == ENTER_SLEEP_MODE)
   {
     static uint8_t sleep_state;
@@ -51,7 +50,6 @@ void control_sleep_mode()
       break;
     }
   }
-  
 }
 
 void factory_reset()
@@ -107,10 +105,10 @@ void sync_FlashData_task_code(void *parameter)
 
 void sync_data_task_code(void *parameter)
 {
-  init_sync_data();
+  // init_sync_data();
   while (1)
   {
-    handle_sync_data();
+    // handle_sync_data();
   }
   
 }
@@ -145,9 +143,9 @@ void init_hw()
     xTaskCreatePinnedToCore(mqtt_handle_task_code,"mqtt",8096,NULL,1,&MqttTask,1);  delay(50);   
     // xTaskCreatePinnedToCore(mqtt_lastest_data_update_task_code,"mqttLastDataUpdate",8096,NULL,1,&MqttLastestDataUpdateTask,1);  delay(50);   
     xTaskCreatePinnedToCore(time_ntp_task_code,"ntp",4096,NULL,1,&GetTimeTask,1);  delay(50);   
-    xTaskCreatePinnedToCore(sync_data_task_code,"sync_data",8096,NULL,1,&Sync_data,1);  delay(50);  
+    // xTaskCreatePinnedToCore(sync_data_task_code,"sync_data",8096,NULL,1,&Sync_data,1);  delay(50);  
     xTaskCreatePinnedToCore(sync_FlashData_task_code,"sync_flash_data",8096,NULL,1,&Sync_FlashData,1);  delay(50);  
-
+    init_rtc_ds3231();
     
 
     // initTimeServerLocal();
@@ -160,8 +158,7 @@ void handle_hw()
 {
   control_sleep_mode();
   handleNetwork();
-  // handleTimeServerLocal();
-  // handle_Ntp();
+  handle_rtc_ds3231();
   
   static uint32_t t_send_data;
   if (millis() - t_send_data > 1000)

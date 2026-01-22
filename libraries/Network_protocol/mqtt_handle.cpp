@@ -174,7 +174,8 @@ void connect_to_broker(char *usr, char *pass)
       client.subscribe(buf_sub_topic);
       sprintf(buf_sub_topic,"%s/%s/%s",PT100_BASE_MQTT_TOPIC, myRam.mqtt_config_data.devId.c_str(), PT100_MQTT_RESPONSE_HISTORY_DATA_TOPIC);
       client.subscribe(buf_sub_topic);
-
+      sprintf(buf_sub_topic,"%s/%s/%s",PT100_BASE_MQTT_TOPIC, myRam.mqtt_config_data.devId.c_str(), PT100_MQTT_RESPONSE_LASTEST_DATA_TOPIC);
+      client.subscribe(buf_sub_topic);
     }
     else
     {
@@ -245,6 +246,7 @@ void initMqtt()
   client.setCallback(callback);
   client.setBufferSize(MQTT_MAX_BUFFER);
   connect_to_broker((char*)myRam.mqtt_config_data.username.c_str(), (char*)myRam.mqtt_config_data.password.c_str());
+  myRam.mqtt_state = FIRST_START_UP;
 }
 
 
@@ -407,15 +409,49 @@ void handle_mqtt()
   reconnectMqtt();
   static uint32_t t_send_data = 0;
   static uint32_t t_bk_data = 0;
+  static uint32_t t_wait_for_data_response = 0;
   static uint8_t state_generate_buf_temp_time_bk;  
   // if ((isConnectedBroker == 0 || myRam.wifi_config_data.is_wifi_connected == 0) && myRam.localServer_time.get_time_ok == 1) // use this condition for local server time
   mqtt_sync_flash_data_to_sv();
-  if ((isConnectedBroker == 0 || myRam.wifi_config_data.is_wifi_connected == 0) && myRam.ntp_time.get_time_ok == 1) // use this condition for ntp server time
+  if ((isConnectedBroker == 0 || myRam.wifi_config_data.is_wifi_connected == 0) && myRam.rtc_time.init_ok == 1) // use this condition for ntp server time
   {
     myRam.mqtt_config_data.isConnectToBroker = 0;
     // myRam.data_sync.sync_state = START_ASSIGN_DATA_TO_RAM;
     myRam.flashData_sync.sync_state = START_ASSIGN_DATA_TO_FLASH;
   }
+  if (myRam.mqtt_config_data.isConnectToBroker)
+  {
+    switch (myRam.mqtt_state)
+    {
+    case SENT_DATA_TO_SV:
+      {
+        t_wait_for_data_response = millis();
+        myRam.mqtt_state = WAIT_FOR_DATA_RESPONSE;
+        break;
+      }
+    case WAIT_FOR_DATA_RESPONSE:
+      {
+        if (millis() - t_wait_for_data_response > 1000)
+        {
+          // had response from server
+          if (myRam.flashData_sync.response_from_server_for_lastestData == 1)
+          {
+            myRam.flashData_sync.response_from_server_for_lastestData = 0;
+          }
+          else
+          {
+            ESP_LOGD(TAG,"No data response => save data to flash");
+            save_data_offline_to_flash();
+          }
+          myRam.mqtt_state = DONE_HANDLE_SENT_MSG;
+        }
+        break;
+      }
+    default:
+      break;
+    }
+  }
+  
   if (millis() - t_send_data > myRam.pt100_data.sampleRate * 1000)
   { 
     ESP_LOGD(TAG, "STATE %d", myRam.flashData_sync.sync_state);
@@ -425,47 +461,25 @@ void handle_mqtt()
       if (myRam.working_status.esp_working_modes == ACTIVE_MODE)
       {
         myRam.mqtt_config_data.isConnectToBroker = 1;
-
-
-        
-        
-        // if (myRam.ntp_time.get_time_ok == 1 && (myRam.flashData_sync.sync_state == FIRST_STARTUP_FLASH_MEMORY || myRam.flashData_sync.sync_state == DONE_SYNC_FLASH_DATA_TO_SV)) // use this condition for ntp server time
-        // if (myRam.flashData_sync.total_offline_data_stored !=)
-        // {
-        //   myRam.
-        // }
-        
-        if (myRam.ntp_time.get_time_ok == 1) // use this condition for ntp server time
+        if (myRam.rtc_time.init_ok == 1) // use this condition for ntp server time
         {
-          if (myRam.flashData_sync.response_from_server_for_lastestData == 1)
-          {
-            myRam.flashData_sync.response_from_server_for_lastestData = 0;
-          }
-          else
-          {
-            // if (myRam.flashData_sync.sync_state)
-            // {
-            //   /* code */
-            // }
-            save_offline_data();
-            // myRam.flashData_sync.sync_state = START_ASSIGN_DATA_TO_FLASH; // when device doesn't receive response data from sv => write it to flash
-          }
           String output;
           StaticJsonDocument<512> doc;
           doc["mac"] = myRam.wifi_config_data.MAC_Address;
           doc["ip"] = myRam.wifi_config_data.STA_IP;
           doc["SR"] = myRam.pt100_data.sampleRate;
           doc["temp"] = myRam.pt100_data.temp;
-          doc["time"] = myRam.ntp_time.ntpDateTimeString; // ntp server time
+          // doc["time"] = myRam.ntp_time.ntpDateTimeString; // ntp server time
+          doc["time"] = myRam.rtc_time.rtcDateTimeString; // rtc  time
           // doc["time"] = myRam.localServer_time.localServerDateTimeString; // local server time
           doc["temp_his"][0] = myRam.pt100_data.temp;
-          doc["time_his"][0] = myRam.ntp_time.ntpDateTimeString;
+          doc["time_his"][0] = myRam.rtc_time.rtcDateTimeString;
           // doc["time_his"][0] = myRam.localServer_time.localServerDateTimeString;
           serializeJson(doc, output);
           Serial.println(output);
           String mqtt_topic_data = "Indr_PT100/" + myRam.mqtt_config_data.devId + "/lastestData";
           send_data_mqtt(mqtt_topic_data, output);
-          
+          myRam.mqtt_state = SENT_DATA_TO_SV;
           
         }
       }

@@ -70,7 +70,8 @@ void save_data_offline_to_flash()
             convert_data<float> tempData;
             tempData.marshall = myRam.pt100_data.temp;
             uint32_t unixTimeStamp;
-            unixTimeStamp = convertHumanDateToUnixTime(myRam.ntp_time.ntpDateTimeString);
+            // unixTimeStamp = convertHumanDateToUnixTime(myRam.ntp_time.ntpDateTimeString);
+            unixTimeStamp = convertHumanDateToUnixTime(myRam.rtc_time.rtcDateTimeString);
             ESP_LOGD(TAG, "unix time: %d", unixTimeStamp);
             convert_data<uint32_t> timeData;
             timeData.marshall = unixTimeStamp;
@@ -110,6 +111,8 @@ void save_data_offline_to_flash()
             // flash.eraseSector(myRam.flashData_sync.flashAddrTail);
             // delay(100);
         }
+        ESP_LOGD(TAG,"ESP RAM MEMORY: %d ", ESP.getFreeHeap());
+        myRam.flashData_sync.total_offline_data_stored = (myRam.flashData_sync.flashAddrTail - myRam.flashData_sync.flashAddrHead) / 8;
         //  myRam.flashData_sync.flashAddrTail
         // myRam.flashData_sync.flashAddrTail += 8;
 
@@ -148,12 +151,23 @@ void init_sync_flashData()
     ESP_LOGD(TAG, "headAddr: %d tailAddr: %d", myRam.flashData_sync.flashAddrHead, myRam.flashData_sync.flashAddrTail);    
     if (myRam.flashData_sync.flashAddrHead > myRam.flashData_sync.flashAddrTail)
     {
+        flash.eraseChip();
+        myRam.flashData_sync.flashAddrTail = 0;
+        myRam.flashData_sync.flashAddrHead = 0;
         myRam.flashData_sync.sync_state = CLEAR_FLASH_DATA;
     }
     else
     {
         myRam.flashData_sync.total_offline_data_stored = (myRam.flashData_sync.flashAddrTail - myRam.flashData_sync.flashAddrHead) / 8;
     }
+    if (myRam.flashData_sync.total_offline_data_stored == 0)
+    {
+        flash.eraseChip();
+        myRam.flashData_sync.flashAddrTail = 0;
+        myRam.flashData_sync.flashAddrHead = 0;
+        myRam.flashData_sync.sync_state = CLEAR_FLASH_DATA;
+    }
+    
     pinMode(27, INPUT_PULLUP);
 }
 
@@ -236,7 +250,7 @@ void handle_sync_flashData()
         }
     case WAIT_TO_SEND_FLASH_DATA_TO_SV:
         {
-            if (millis() - t_sync_flash_data > 1000)
+            if (millis() - t_sync_flash_data > 2000)
             {
                 myRam.flashData_sync.sync_state = START_SEND_FLASH_DATA_TO_SV;
                 t_sync_flash_data = millis();

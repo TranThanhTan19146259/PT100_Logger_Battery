@@ -7,10 +7,11 @@
 // uint16_t au16data[16];
 // uint8_t u8state;
 #include "ntp_handle.h"
-#include "sync_data_to_sv.h"
+// #include "sync_data_to_sv.h"
 #include "sync_data_flash_to_sv.h"
 #include <Adafruit_MAX31865.h>
-#include "time_server_local_handle.h"
+#include "rtc_ds3231_pt100.h"
+// #include "time_server_local_handle.h"
 // The value of the Rref resistor. Use 430.0 for PT100 and 4300.0 for PT1000
 #define RREF      430.0
 #define RNOMINAL  100.0

@@ -13,4 +13,4 @@ void read_pt100_flash(uint32_t addr, uint64_t &U64Data);
 
 void init_sync_flashData();
 void handle_sync_flashData();
-void save_offline_data();
+void save_data_offline_to_flash();

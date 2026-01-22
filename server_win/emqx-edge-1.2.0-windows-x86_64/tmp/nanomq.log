@@ -10519,3 +10519,34 @@
 2026-01-21 13:22:23 [24296] WARN  nmq_mqtt.c:986: mqtt-explorer-8f78055a pipe close!
 2026-01-21 13:22:23 [24296] WARN  mqtt_parser.c:1339: mqtt-explorer-8f78055a offline!
 2026-01-21 13:22:23 [24296] WARN  nmq_mqtt.c:431: pipe id 2016390686 is gone, pub failed
+2026-01-21 20:32:15 [7560] WARN  broker.c:2149: Default bridging Clientid is nanomq-4e5e9508
+2026-01-21 20:32:15 [7560] WARN  broker.c:1262: EMQX Edge (ver 1.2.0) Serving MQTT TCP on nmq-tcp://0.0.0.0:1883
+2026-01-21 20:32:15 [7560] WARN  broker.c:1290: EMQX Edge (ver 1.2.0) Serving MQTT over WebSocket on nmq-ws://0.0.0.0:8083/mqtt
+2026-01-21 20:32:15 [7560] WARN  web_server.c:313: Http Server folder set to D:\Indruino_Projects\indruino\company_project\PT100_Logger_esp32\server_win\emqx-edge-1.2.0-windows-x86_64/dist
+2026-01-21 20:32:15 [7560] WARN  broker.c:1376: EMQX Edge (ver 1.2.0) Serving HTTP Server on http://0.0.0.0:8081
+2026-01-21 20:32:15 [7560] WARN  broker.c:1458: NanoMQ Broker is started successfully!
+
+2026-01-22 11:43:23 [7560] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-22 11:45:37 [7560] ERROR pipe.c:520: Client ID collision or set ID failed!
+2026-01-22 11:45:37 [7560] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-22 11:45:37 [7560] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-22 11:45:37 [7560] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-22 11:45:37 [7560] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-22 11:45:37 [7560] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-22 11:49:23 [7560] ERROR pipe.c:520: Client ID collision or set ID failed!
+2026-01-22 11:49:23 [7560] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-22 11:49:23 [7560] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-22 11:49:23 [7560] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
+2026-01-22 11:49:23 [7560] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-22 11:49:23 [7560] WARN  mqtt_parser.c:1335: PT100_LoggerB8D61A6A65C0 online!
+2026-01-22 11:55:41 [7560] WARN  nmq_mqtt.c:245: Warning: close pipe & kick client due to KeepAlive timeout!
+2026-01-22 11:55:41 [7560] WARN  nmq_mqtt.c:986: PT100_LoggerB8D61A6A65C0 pipe close!
+2026-01-22 11:55:41 [7560] WARN  broker_tcp.c:683: nni aio recv error!! Object closed
+
+2026-01-22 11:55:41 [7560] WARN  broker_tcp.c:974: tcptran_pipe_recv_cb: recv_error rv: 139
+
+2026-01-22 11:55:41 [7560] WARN  mqtt_parser.c:1339: PT100_LoggerB8D61A6A65C0 offline!
