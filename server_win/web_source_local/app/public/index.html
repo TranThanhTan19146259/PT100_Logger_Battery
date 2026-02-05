@@ -15,6 +15,7 @@
     <script src="resources/js/db_server_infor.js"></script>
     <script src="resources/js/chart_lib/dist/chart.umd.min.js"></script>
     <!-- Then load your custom chart file -->
+    <script src="/resources/js/sortWorker.js"></script>
     <script src="/resources/js/chart_handle.js"></script> 
     <script src="/resources/js/device_manager.js"></script>
     <script src="/resources/js/history_table_handle.js"></script>
@@ -29,7 +30,7 @@
     </div>
 
     <div id="deviceDetailView" class="device-detail">
-        <button class="back-btn" onclick="showDeviceList()">← Back to Devices</button>
+        <button class="back-btn" onclick="showDeviceList();">← Back to Devices</button>
         
         <div class="detail-header">
             <h2 id="deviceName">Device 1</h2>
@@ -55,6 +56,10 @@
                 <span class="info-value" id="SR">1</span>
             </div>
             <div class="info-item">
+                <span class="info-label">Reset times:</span>
+                <span class="info-value" id="RT">0</span>
+            </div>
+            <div class="info-item">
                 <span class="info-label">Last Updated:</span>
                 <span class="info-value" id="lastUpdated">2 minutes ago</span>
             </div>
@@ -71,9 +76,11 @@
 
         <!-- Tab Navigation -->
         <div class="tab-navigation">
-            <button class="tab-btn active" onclick="switchTab('chart')">Chart</button>
-            <button class="tab-btn" onclick="switchTab('history'); sort_table()">History</button>
-            <button class="tab-btn" onclick="switchTab('control')" >Control</button>
+            <button class="tab-btn active" onclick="switchTab('chart');">Chart</button>
+            <!-- <button class="tab-btn" onclick="switchTab('history'); sort_table();">History</button> -->
+            <!-- <button class="tab-btn" onclick="switchTab('history'); sortViewportWindow();">History</button> -->
+            <button class="tab-btn" onclick="switchTab('history');">History</button>
+            <button class="tab-btn" onclick="switchTab('control');" >Control</button>
         </div>
 
 
@@ -85,6 +92,26 @@
         </div>
         <!-- History Tab -->
         <div id="historyTab" class="tab-content">
+        <div class="history-container" id="historyScroll">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Time</th>
+                        <th>Temperature</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: #999;">
+                            No data available
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        </div>
+        <!-- <div id="historyTab" class="tab-content">
             <div class="history-container">
                 <table class="history-table">
                     <thead>
@@ -101,7 +128,7 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </div> -->
         <!-- Control Tab -->
         <div id="controlTab" class="tab-content">
             <div class="control-container">

@@ -17,7 +17,6 @@ typedef struct Ram{
     Mqtt_state_e mqtt_state;
     Ntp_time_t ntp_time;
     LocalServer_time localServer_time;
-    sync_data_sv_backup_t data_sync;
     sync_Flashdata_sv_backup_t flashData_sync;
     Rtc_time_t rtc_time;
 }Ram_t;

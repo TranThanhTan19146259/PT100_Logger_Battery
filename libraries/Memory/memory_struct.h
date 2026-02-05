@@ -11,13 +11,15 @@ typedef struct PT100_data_t
     uint8_t time_get_data;
     uint8_t sampleRate;
     uint64_t tempTimeRawData; // this data is used for sotring into flash
+    bool timer_tick;
+    uint8_t reset_times;
 } PT100_data;
 
 typedef struct Wifi_config_data
 {
-    bool wifi_ap_sta; //0: AP || 1: STA 
-    bool is_wifi_connected;
-    bool reset_wifi;
+    volatile bool wifi_ap_sta; //0: AP || 1: STA 
+    volatile bool is_wifi_connected;
+    volatile bool reset_wifi;
     String ssid_ap;
     String password_ap;
     String ssid_sta;
@@ -34,7 +36,10 @@ typedef struct Mqtt_config_data
     String username;
     String password;
     bool isConnectToBroker;
+    volatile bool mqttConnection;
     String devId;
+    bool mqtt_tick;
+    String dateTimeLastestBuffer;
 } Mqtt_config_data_t;
 
 typedef enum Mqtt_state
@@ -101,6 +106,13 @@ typedef enum state_sync_FlashData_backup
 
 } state_sync_FlashData_backup_e;
 
+// typedef struct sync_flash_queue
+// {
+//     uint8_t q_adrr_tail;
+//     uint8_t q_adrr_head;
+// } sync_flash_queue_t;
+
+
 typedef struct sync_Flashdata_sv_backup
 {
     uint32_t flashAddrTail = 0x0000; // get current flash address to detect sector and flash address to write data
@@ -111,6 +123,8 @@ typedef struct sync_Flashdata_sv_backup
     uint32_t ptr_buf_flash_offline_data;
     bool response_from_server = 0; // offline data stream
     bool response_from_server_for_lastestData = 0; // online data stream
+    bool flash_init_ok = 0;
+    volatile bool flash_save_data_tick;
 } sync_Flashdata_sv_backup_t;
 
 typedef struct Rtc_time
@@ -119,6 +133,7 @@ typedef struct Rtc_time
     String rtcDateString;
     String rtcDateTimeString;
     struct tm rtcTime;
+    bool rtc_tick;
     bool init_ok;
 } Rtc_time_t;
 

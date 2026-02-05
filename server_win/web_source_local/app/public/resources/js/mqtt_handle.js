@@ -22,6 +22,7 @@ function generate_device_data()
             mac: 'unknown',
             ip: 'unknown',
             sr: 'unknown',
+            rt: 'unknown',
             lastUpdated: 'Never',
             temperature: '--',
             time: '--'
@@ -67,13 +68,35 @@ function connectMQTT() {
             // Find device number from ID
             const deviceNumber = parseInt(deviceId.split('-')[1]);
             try {
+                if(lastestDataFromDevices == "status")
+                {
+                    let devId = `DEV-${String(deviceNumber).padStart(3, '0')}`;
+                    let topicResLastestData = `Indr_PT100/${devId}/responseStatus` 
+                    // response_lastest_Data = {
+                    //                             time: data.time,
+                    //                             status: "ok"
+                    //                         };
+                    // response_lastest_Data_json = JSON.stringify(response_lastest_Data);
+                    if(message.toString() == "ping")
+                    {
+                        publishMQTT(topicResLastestData,"pong");
+                    }
+                }
                 if(lastestDataFromDevices == "lastestData")
                 {
                     // Parse the JSON message
                     const data = JSON.parse(message.toString());
-                    // console.log(`Received data from ${deviceId}:`, data);
+                    console.log(`Received data from ${deviceId}:`, data);
                     update_new_data_to_database(deviceNumber, data);
                     devices_status_handle(deviceNumber);
+                    let devId = `DEV-${String(deviceNumber).padStart(3, '0')}`;
+                    let topicResLastestData = `Indr_PT100/${devId}/responseLastestData` 
+                    response_lastest_Data = {
+                                                time: data.time,
+                                                status: "ok"
+                                            };
+                    response_lastest_Data_json = JSON.stringify(response_lastest_Data);
+                    publishMQTT(topicResLastestData,response_lastest_Data_json);
                     // Update device data
                     if (deviceData[deviceNumber]) {
                         deviceData[deviceNumber].temperature = data.temp || '--';
@@ -82,6 +105,7 @@ function connectMQTT() {
                         deviceData[deviceNumber].ip = data.ip;
                         deviceData[deviceNumber].mac = data.mac;
                         deviceData[deviceNumber].sr = data.SR;
+                        deviceData[deviceNumber].rt = data.RT;
                         deviceData[deviceNumber].lastUpdated = new Date().toLocaleTimeString();
                         
                         // If we're viewing this device, update the display
@@ -94,8 +118,26 @@ function connectMQTT() {
                 }
                 if(lastestDataFromDevices == "control")
                 {
-                    // handle_data_response_from_devices(deviceId,message);
+                    handle_data_response_from_devices(deviceId,message);
                 }
+                if(lastestDataFromDevices == "hisData")
+                {
+                    const data = JSON.parse(message.toString());
+                    console.log(`recv his data from DEV ${deviceNumber}`);
+                    let devId = `DEV-${String(deviceNumber).padStart(3, '0')}`;
+                    let topicResHIsData = `Indr_PT100/${devId}/responseHisData` 
+                    response_his_Data = {status: "ok"};
+                    response_his_Data_json = JSON.stringify(response_his_Data);
+                    publishMQTT(topicResHIsData,response_his_Data_json);
+                    update_new_data_to_database(deviceNumber, data);
+                    
+                    if (currentDeviceView === deviceNumber) {
+                            mqtt_data_input = message.toString();
+                            update_history_table(mqtt_data_input);
+                            // updateDeviceDisplay(deviceNumber);
+                    }
+                }
+
             } catch (e) {
                 console.error('Error parsing MQTT message:', e);
             }
@@ -130,6 +172,7 @@ function updateDeviceDisplay(deviceNumber) {
     document.getElementById('macAddress').textContent = device.mac;
     document.getElementById('deviceIp').textContent = device.ip;
     document.getElementById('SR').textContent = device.sr;
+    document.getElementById('RT').textContent = device.rt;
     // Update status badge
     // const statusBadge = document.getElementById('deviceStatus');
     // statusBadge.textContent = device.status.charAt(0).toUpperCase() + device.status.slice(1);
@@ -150,24 +193,33 @@ function updateDeviceDisplay(deviceNumber) {
         dataList.appendChild(li);
     });
     // data for drawing chart
-    // lastest_data_updated = device.temperature
-
-    // console.log(lastest_data_updated);
-
+    // if(!isNaN(parseFloat(device.temperature)))
+    // {
+    //     // Define your time window (e.g., only accept data from last 10 minutes)
+    //     const now = new Date();
+    //     const currentTimestamp = now.getTime();
+    //     const timeWindowStart = currentTimestamp - (10 * 60 * 1000); // 10 minutes ago
+    //     const timeWindowEnd = currentTimestamp + (1 * 60 * 1000); // 1 minute in future (buffer)
+        
+    //     // Assuming device has a timestamp field, check if it's within range
+    //     // If device doesn't have timestamp, use current time
+    //     const deviceTimestamp = device.time ? new Date(device.time).getTime() : currentTimestamp;
+        
+    //     if (deviceTimestamp >= timeWindowStart && deviceTimestamp <= timeWindowEnd) {
+    //         lastest_data_updated = (device.temperature);
+    //         console.log("✓ Temperature accepted:", device.temperature);
+    //     } else {
+    //         lastest_data_updated = 0;
+    //         console.log("✗ Temperature rejected (old data)");
+    //     }
+    // }
+    // else lastest_data_updated = 0;
     if(!isNaN(parseInt(device.temperature))) 
     {
         // remove_chart();
         lastest_data_updated = (device.temperature);   
     }
     else lastest_data_updated = 0;
-    // try
-    // {
-
-    // }
-    // catch
-    // {
-    //     lastest_data_updated = 0;
-    // }
 }
 
 

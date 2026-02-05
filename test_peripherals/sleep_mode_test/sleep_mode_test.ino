@@ -12,7 +12,7 @@ void setup() {
   // Print the wake up reason
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause();
-
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
   switch(wakeup_reason) {
     case ESP_SLEEP_WAKEUP_EXT0: 
       Serial.println("Wakeup caused by external signal on RTC IO"); 
@@ -25,7 +25,7 @@ void setup() {
   // Enable ext0 wake up on the button pin. 
   // The ESP32 will wake up when the pin is pulled LOW (button pressed).
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_13, 0); 
-  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+  // esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
   Serial.println("Entering deep sleep...");
   // Wait for a moment to ensure the wake up reason is printed
   delay(1000);

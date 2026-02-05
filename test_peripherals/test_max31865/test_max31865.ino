@@ -18,7 +18,9 @@
 
 // Use software SPI: CS, DI, DO, CLK
 // Adafruit_MAX31865 thermo = Adafruit_MAX31865(10, 11, 12, 13); // Arduino uno
-Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 13, 12, 14); // ESP32 
+// Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 17, 16, 5); // ESP32 
+#define MAX_POWER_PIN 33
+Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 17, 16, 5); // ESP32 
 
 // Adafruit_MAX31865 thermo = Adafruit_MAX31865(4, 5, 6, 7);
 
@@ -34,7 +36,7 @@ Adafruit_MAX31865 thermo = Adafruit_MAX31865(27, 13, 12, 14); // ESP32
 void setup() {
   Serial.begin(115200); 
   Serial.println("Adafruit MAX31865 PT100 Sensor Test!");
-
+  pinMode(MAX_POWER_PIN, OUTPUT);
   thermo.begin(MAX31865_3WIRE);  // set to 2WIRE or 4WIRE as necessary
 }
 
@@ -48,7 +50,27 @@ void loop() {
   Serial.print("Ratio = "); Serial.println(ratio,8);
   Serial.print("Resistance = "); Serial.println(RREF*ratio,8);
   Serial.print("Temperature = "); Serial.println(thermo.temperature(RNOMINAL, RREF));
+  if (Serial.available() > 0)
+  {
+    char c = Serial.read();
+    switch (c)
+    {
+    case '0':
+      {
+        digitalWrite(MAX_POWER_PIN, 0);
+        break;
+      }
+    case '1':
+      {
+        digitalWrite(MAX_POWER_PIN, 1);
+        break;
+      }
+    default:
+      break;
+    }
 
+  }
+  
   // Check and print any faults
   uint8_t fault = thermo.readFault();
   if (fault) {

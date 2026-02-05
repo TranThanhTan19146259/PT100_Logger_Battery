@@ -5,6 +5,8 @@
 #include <ArduinoJson.h>    
 #include <esp_wifi.h>
 
+#define MCU_FEQ 80// 80MHz
+
 void initProtocol();
 void initWifiMode();
 void initLocalAPI();

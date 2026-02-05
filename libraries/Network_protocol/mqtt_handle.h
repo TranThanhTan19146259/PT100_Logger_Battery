@@ -7,6 +7,7 @@
 #include "flash_read_write.h"
 #include "str_param_def.h"
 #include "sync_data_flash_to_sv.h"
+#include "hw_handle.h"
 
 #define MQTT_HOSTNAME "192.168.11.101"
 #define MQTT_PORT     1883
@@ -23,21 +24,31 @@
 #define PT100_MQTT_CONTROL_TOPIC      "control"
 #define PT100_MQTT_RESPONSE_LASTEST_DATA_TOPIC      "responseLastestData"
 #define PT100_MQTT_RESPONSE_HISTORY_DATA_TOPIC      "responseHisData"
-#define PT100_SAMPLE_RATE_CMD         "sampleRate"
+#define PT100_MQTT_RESPONSE_STATUS                  "responseStatus"
+#define PT100_MQTT_STATUS                           "status"
+#define PT100_SAMPLE_RATE_CMD                       "sampleRate"
 
 #define MQTT_SERVER_TIMEOUT_COUNT 5 
 #define MQTT_MAX_BUFFER 2048
-#define MAX_BUFFER_DATA_POINTS_SEND_TO_SV 5    
+#define MAX_BUFFER_DATA_POINTS_SEND_TO_SV 20    
 
 
 void initMqtt();
+void init_client_control_mqtt();
 void reconnectMqtt();
 void connect_to_broker(char* usr,  char* pass);
 void callback(char* topic, byte *payload, unsigned int length);
 void handle_mqtt();
-void mqtt_update_data_task();
 
+void handle_mqtt_client_control();
+
+// void mqtt_update_data_task();
+// void send_lastestData_to_sv();
+void mqtt_status_ack_check();
+void send_lastestData_to_sv(String dateTimeString);
 void send_data_mqtt(String topic, String jsonData);
+void send_data_mqtt_control_client(String topic, String jsonData);
+
 
 
 

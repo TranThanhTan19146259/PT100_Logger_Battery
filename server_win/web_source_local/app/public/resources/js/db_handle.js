@@ -15,6 +15,16 @@ document.addEventListener("DOMContentLoaded", function() {
     generate_device_fields();
 });
 
+let prev_dataJson = null;
+function isDuplicated(oldObj, newObj){
+    const oldArr = oldObj?.time_his;
+    const newArr = newObj?.time_his;
+
+    if (oldArr.length !== newArr.length){
+        return true;
+    }
+    return newArr.some((val, i) => val !== oldArr[i]);
+}
 
 function update_new_data_to_database(devNumber, dataJson)
 {
@@ -23,9 +33,20 @@ function update_new_data_to_database(devNumber, dataJson)
         time: dataJson.time_his
     };
     data = JSON.stringify(data);
-    console.log(`recv from ${devNumber}: ${data}`);
-
-    putRequestHttp(db_url_base, db_enpoint, String(devNumber), data, (response) => {
+    // console.log(`recv from ${devNumber}: ${data}`);
+    let change = false;
+    if(prev_dataJson){
+        change = isDuplicated(prev_dataJson, dataJson);
+    }
+    
+    if (change || !prev_dataJson){
+        putRequestHttp(db_url_base, db_enpoint, String(devNumber), data, (response) => {
             // console.log(response);
-    });
+        });
+    }
+    console.log(change);
+    console.log(dataJson);
+    prev_dataJson = structuredClone(dataJson);
+    
 }
+

@@ -1,32 +1,110 @@
 let count_req_times = 0;
 
-function parseDate(dateStr) {
-    // "19/01/2026 14:10:57"
-    const [datePart, timePart] = dateStr.split(" ");
-    const [day, month, year] = datePart.split("/").map(Number);
-    const [hour, min, sec] = timePart.split(":").map(Number);
+function parseDate(str) {
+    if (!str || typeof str !== "string") return null;
 
-    return new Date(year, month - 1, day, hour, min, sec);
+    const parts = str.trim().split(" ");
+    if (parts.length !== 2) return null;
+
+    const [datePart, timePart] = parts;
+
+    const dmy = datePart.split("/").map(Number);
+    const hms = timePart.split(":").map(Number);
+
+    if (dmy.length !== 3 || hms.length !== 3) return null;
+
+    const [d, m, y] = dmy;
+    const [hh, mm, ss] = hms;
+
+    if ([d, m, y, hh, mm, ss].some(n => !Number.isFinite(n))) {
+        return null;
+    }
+
+    return new Date(y, m - 1, d, hh, mm, ss);
 }
 
-function sort_table() {
+const tbody = document.getElementById("historyTableBody");
+
+// Track existing timestamps → prevents duplicates
+const timeIndex = new Set();
+
+// throttle sorting
+let sortScheduled = false;
+
+function sort_table_safe() {
     const tbody = document.getElementById("historyTableBody");
+    if (!tbody) return;
+
     const rows = Array.from(tbody.rows);
+    if (rows.length <= 1) return;
 
-    // 1️⃣ Sort by Time column (ASC)
-    rows.sort((a, b) => {
-        const timeA = parseDate(a.cells[1].innerText);
-        const timeB = parseDate(b.cells[1].innerText);
-        return timeA - timeB;
+    const seen = new Set();
+    const uniqueRows = [];
+
+    for (const row of rows) {
+        // Skip placeholder or broken rows
+        if (row.cells.length < 3) continue;
+
+        const timeText = row.cells[1].textContent.trim();
+        const tempText = row.cells[2].textContent.trim();
+
+        // 🔑 Dedup key (time + temp)
+        const key = `${timeText}|${tempText}`;
+
+        if (seen.has(key)) {
+            // duplicate → remove from DOM
+            row.remove();
+            continue;
+        }
+
+        seen.add(key);
+
+        // Ensure timestamp exists
+        if (!row.dataset.ts) {
+            const d = parseDate(timeText);
+            row.dataset.ts = d ? d.getTime() : 0;
+        }
+
+        uniqueRows.push(row);
+    }
+
+    // 🔥 Sort ASC by timestamp
+    uniqueRows.sort((a, b) => Number(a.dataset.ts) - Number(b.dataset.ts));
+
+    // 🔁 Re-append + re-number
+    const frag = document.createDocumentFragment();
+    uniqueRows.forEach((row, i) => {
+        row.cells[0].textContent = i + 1;
+        frag.appendChild(row);
     });
 
-    // 2️⃣ Re-append rows + re-number No column
-    rows.forEach((row, index) => {
-        row.cells[0].innerText = index + 1; // No: 1,2,3...
-        tbody.appendChild(row);
-    });
+    tbody.appendChild(frag);
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    const historyScroll = document.getElementById("historyScroll");
+    const tbody = document.getElementById("historyTableBody");
+
+    if (!historyScroll || !tbody) {
+        console.error("History elements not found");
+        return;
+    }
+
+    let scrollTimer = null;
+
+    historyScroll.addEventListener("scroll", () => {
+        console.log("HISTORY TABLE SCROLLED");
+
+        // clear previous timer
+        clearTimeout(scrollTimer);
+
+        // run sort ONLY after scrolling stops
+        scrollTimer = setTimeout(() => {
+            console.log("Sorting after scroll stop");
+            sort_table_safe();
+        }, 300);
+    });
+});
 
 function generate_history_table()
 {
@@ -65,39 +143,21 @@ function generate_history_table()
             }
         }
     });
-    // insert row to his_table
-    // let newRow = his_table.insertRow(-1);
-
-    // // Insert a cell in the row at index 0
-    // let timeCell = newRow.insertCell(0);
-    // let tempCell = newRow.insertCell(1);
-
-    // Append a text node to the cell
-
-    // let tempText = document.createTextNode("30");
-    // tempCell.appendChild(tempText);
-    // let timeText = document.createTextNode("10:30");
-    // timeCell.appendChild(timeText);
-    // let dev_json_obj = {
-    //     devId: "DEV-001",
-    //     temp: [30,40,50,60,100,50,80],
-    //     time: ["10:30:50","10:30:51","10:30  :52","10:30:53","10:30:54","10:30:55","10:30:56"]
-    // }
-    // dev_json_obj = JSON.stringify(dev_json_obj);
-    // console.log(dev_json_obj);
-    // putRequestHttp(db_url_base, db_enpoint, "/1", dev_json_obj, (response) => {
-    //     console.log(response);
-    // });
-    // delRequestHttp(db_url_base, db_enpoint, "/30", (response) => {
-    //     console.log(response);
-    // });
-    
-    // console.log("table history");
 }
 
-function scroll_history_table_handle()
+
+
+let prevData = null;
+
+function isChanged(oldObj, newObj)
 {
-    
+    const oldArr = oldObj?.time_his;
+    const newArr = newObj?.time_his;
+
+    if (oldArr.length !== newArr.length){
+        return true;
+    }
+    return newArr.some((val, i) => val !== oldArr[i]);
 }
 
 
@@ -107,6 +167,11 @@ function update_history_table(inputData)
     let his_table = document.getElementById("historyTableBody");
     // update table rows after adding new data points;
     let lastest_table_rows = his_table.rows.length;
+    
+    /*
+    
+    */
+
     try{
         inputData = JSON.parse(inputData)
         // console.log(`Received: `, inputData.time_his);
@@ -119,21 +184,43 @@ function update_history_table(inputData)
         for (let i = 0; i < inputData.time_his.length; i++) {
             const time = inputData.time_his[i];
             const temp = inputData.temp_his[i];
-            let newRow = his_table.insertRow(-1);
-            // Insert a cell in the row at index 0
-            let noCell = newRow.insertCell(0);
-            let timeCell = newRow.insertCell(1);
-            let tempCell = newRow.insertCell(2);
-            let noText = document.createTextNode(String(i + lastest_table_rows));
-            let timeText = document.createTextNode(String(time));
-            let tempText = document.createTextNode(String(temp));
-            noCell.appendChild(noText);
-            timeCell.appendChild(timeText);
-            tempCell.appendChild(tempText);
+            // let change = false;
+            
+            // if (prevData){
+            //     change = isChanged(prevData, inputData);
+            //         // JSON.stringify(inputData.time_his) != JSON.stringify(prevData.time_his)
+            // }
+            // console.log(inputData);
+            // console.log(prevData);
+
+            inputData.time_his.forEach((time, i) =>{
+                const temp = inputData.temp_his[i];
+                let newRow = his_table.insertRow(-1);
+                // Insert a cell in the row at index 0
+                let noCell = newRow.insertCell(0);
+                let timeCell = newRow.insertCell(1);
+                let tempCell = newRow.insertCell(2);
+                let noText = document.createTextNode(String(i + lastest_table_rows));
+                let timeText = document.createTextNode(String(time));
+                let tempText = document.createTextNode(String(temp));
+                noCell.appendChild(noText);
+                timeCell.appendChild(timeText);
+                tempCell.appendChild(tempText);
+
+            })
+            
+            // if (change || !prevData)
+            // {
+            //     // console.log("Data changed");
+            // }
+            // prevData = structuredClone(inputData);
+
+
+            
         }
     }
     // re-arrange history table after getting data from device
-    sort_table();
+    // sort_table();
 }
 
 function remove_history_table()

@@ -58,63 +58,72 @@ void getInitInfor_W25Q128()
   Serial.printf("Reported capacity: %lu bytes\n", (unsigned long)flash.getCapacity());
 }
 
-void save_data_offline_to_flash()
+// void save_data_offline_to_flash_with_time(String timeSnapShot)
+// {
+//     ESP_LOGD(TAG, "rawTimeSnapShot before: %s", timeSnapShot.c_str());
+// }
+
+void save_data_offline_to_flash(String dateTimeString)
 {
-
-        uint64_t U64_data_R;
-        flash.readAnything(myRam.flashData_sync.flashAddrTail, U64_data_R);
-        ESP_LOGD(TAG, "u64Data = 0x%016" PRIx64, U64_data_R);
-
-        if (U64_data_R == 0xFFFFFFFFFFFFFFFF) // empty address
+        ESP_LOGD(TAG, "rawTime before: %s", dateTimeString.c_str());
+        if (myRam.flashData_sync.flash_init_ok == 1)
         {
-            convert_data<float> tempData;
-            tempData.marshall = myRam.pt100_data.temp;
-            uint32_t unixTimeStamp;
-            // unixTimeStamp = convertHumanDateToUnixTime(myRam.ntp_time.ntpDateTimeString);
-            unixTimeStamp = convertHumanDateToUnixTime(myRam.rtc_time.rtcDateTimeString);
-            ESP_LOGD(TAG, "unix time: %d", unixTimeStamp);
-            convert_data<uint32_t> timeData;
-            timeData.marshall = unixTimeStamp;
-            convert_data<uint64_t> timeTempData;
-            timeTempData.unmarshall[0] = timeData.unmarshall[0]; 
-            timeTempData.unmarshall[1] = timeData.unmarshall[1];
-            timeTempData.unmarshall[2] = timeData.unmarshall[2];
-            timeTempData.unmarshall[3] = timeData.unmarshall[3];
-
-            timeTempData.unmarshall[4] = tempData.unmarshall[0];
-            timeTempData.unmarshall[5] = tempData.unmarshall[1];
-            timeTempData.unmarshall[6] = tempData.unmarshall[2];
-            timeTempData.unmarshall[7] = tempData.unmarshall[3];
+            uint64_t U64_data_R = 0xFFFFFFFFFFFFFFFF;
             // flash.readAnything(myRam.flashData_sync.flashAddrTail, U64_data_R);
-            // ESP_LOGD(TAG, "data W = 0x%016" PRIx64, timeTempData.marshall);
-            
-            if (!flash.writeAnything(myRam.flashData_sync.flashAddrTail, timeTempData.marshall))
+            // ESP_LOGD(TAG, "u64Data = 0x%016" PRIx64, U64_data_R);
+
+            if (U64_data_R == 0xFFFFFFFFFFFFFFFF) // empty address
             {
-                ESP_LOGD(TAG, "data is written failed !");
+                convert_data<float> tempData;
+                tempData.marshall = myRam.pt100_data.temp;
+                uint32_t unixTimeStamp;
+                // unixTimeStamp = convertHumanDateToUnixTime(myRam.ntp_time.ntpDateTimeString);
+                unixTimeStamp = convertHumanDateToUnixTime(dateTimeString);
+                ESP_LOGD(TAG, "unix time: %d rawTime after: %s", unixTimeStamp, dateTimeString.c_str());
+                convert_data<uint32_t> timeData;
+                timeData.marshall = unixTimeStamp;
+                convert_data<uint64_t> timeTempData;
+                timeTempData.unmarshall[0] = timeData.unmarshall[0]; 
+                timeTempData.unmarshall[1] = timeData.unmarshall[1];
+                timeTempData.unmarshall[2] = timeData.unmarshall[2];
+                timeTempData.unmarshall[3] = timeData.unmarshall[3];
+
+                timeTempData.unmarshall[4] = tempData.unmarshall[0];
+                timeTempData.unmarshall[5] = tempData.unmarshall[1];
+                timeTempData.unmarshall[6] = tempData.unmarshall[2];
+                timeTempData.unmarshall[7] = tempData.unmarshall[3];
+                // flash.readAnything(myRam.flashData_sync.flashAddrTail, U64_data_R);
+                // ESP_LOGD(TAG, "data W = 0x%016" PRIx64, timeTempData.marshall);
+                
+                if (!flash.writeAnything(myRam.flashData_sync.flashAddrTail, timeTempData.marshall))
+                {
+                    ESP_LOGD(TAG, "data is written failed !");
+                }
+                else
+                {
+                    uint64_t timeTempDataRaw;
+
+                    flash.readAnything(myRam.flashData_sync.flashAddrTail, timeTempDataRaw);
+                    ESP_LOGD(TAG, "Data R = 0x%016" PRIx64, timeTempDataRaw);
+
+                }
+                myRam.flashData_sync.flashAddrTail += 8;
+                // myRam.flashData_sync.flash_save_data_tick = 0;
+                //  flash.writeAnything(myRam.flashData_sync.flashAddrTail, timeTempData.marshall);
+                // ESP_LOGD(TAG, "addr stored: %x", myRam.flashData_sync.flashAddrTail);
             }
             else
             {
-                uint64_t timeTempDataRaw;
-
-                flash.readAnything(myRam.flashData_sync.flashAddrTail, timeTempDataRaw);
-                ESP_LOGD(TAG, "Data R = 0x%016" PRIx64, timeTempDataRaw);
-
+                // ESP_LOGD(TAG, "sector %d is not empty", (myRam.flashData_sync.flashAddrTail / SECTOR_SIZE));
+                // if (!flash.eraseSector(myRam.flashData_sync.flashAddrTail)) Serial.println("Erase FAILED");
+                // flash.eraseSector(myRam.flashData_sync.flashAddrTail);
+                // delay(100);
             }
-            //  flash.writeAnything(myRam.flashData_sync.flashAddrTail, timeTempData.marshall);
-            // ESP_LOGD(TAG, "addr stored: %x", myRam.flashData_sync.flashAddrTail);
-            myRam.flashData_sync.flashAddrTail += 8;
+            myRam.flashData_sync.total_offline_data_stored = (myRam.flashData_sync.flashAddrTail - myRam.flashData_sync.flashAddrHead) / 8;
+            // myRam.flashData_sync.flashAddrTail += 8;
+            //  myRam.flashData_sync.flashAddrTail
+            // myRam.flashData_sync.flashAddrTail += 8;
         }
-        else
-        {
-            ESP_LOGD(TAG, "sector %d is not empty", (myRam.flashData_sync.flashAddrTail / SECTOR_SIZE));
-            // if (!flash.eraseSector(myRam.flashData_sync.flashAddrTail)) Serial.println("Erase FAILED");
-            // flash.eraseSector(myRam.flashData_sync.flashAddrTail);
-            // delay(100);
-        }
-        ESP_LOGD(TAG,"ESP RAM MEMORY: %d ", ESP.getFreeHeap());
-        myRam.flashData_sync.total_offline_data_stored = (myRam.flashData_sync.flashAddrTail - myRam.flashData_sync.flashAddrHead) / 8;
-        //  myRam.flashData_sync.flashAddrTail
-        // myRam.flashData_sync.flashAddrTail += 8;
 
     
 }
@@ -131,9 +140,15 @@ void read_pt100_flash(uint32_t addr, uint64_t &U64Data)
 void init_sync_flashData()
 {
     SPI.begin(PIN_SCK, PIN_MISO, PIN_MOSI, PIN_CS);
+    uint8_t count_init_flash = 0;
     if (!flash.begin()) {
-      Serial.println("Flash NOT detected. Check 3V3, GND, CS, and wiring.");
-    //   while (1) delay(10);
+        Serial.println("Flash NOT detected. Check 3V3, GND, CS, and wiring.");
+        myRam.flashData_sync.flash_init_ok = 0;
+        count_init_flash = 0;
+    }
+    else
+    {
+        count_init_flash = 1;
     }
     flash.setClock(128000);
     getInitInfor_W25Q128();
@@ -148,7 +163,9 @@ void init_sync_flashData()
     }
     myRam.flashData_sync.flashAddrHead = headFlashAddr.marshall;     
     myRam.flashData_sync.flashAddrTail = tailFlashAddr.marshall;
-    ESP_LOGD(TAG, "headAddr: %d tailAddr: %d", myRam.flashData_sync.flashAddrHead, myRam.flashData_sync.flashAddrTail);    
+    
+    myRam.flashData_sync.flashAddrHead = 0;
+    myRam.flashData_sync.flashAddrTail = 0;
     if (myRam.flashData_sync.flashAddrHead > myRam.flashData_sync.flashAddrTail)
     {
         flash.eraseChip();
@@ -167,8 +184,29 @@ void init_sync_flashData()
         myRam.flashData_sync.flashAddrHead = 0;
         myRam.flashData_sync.sync_state = CLEAR_FLASH_DATA;
     }
+    if (count_init_flash != 0)
+    {
+        while (1)
+        {
+            uint64_t U64_data_R;
+            flash.readAnything(myRam.flashData_sync.flashAddrTail, U64_data_R);
+            // ESP_LOGD(TAG, "u64Data = 0x%016" PRIx64, U64_data_R);
+            if (U64_data_R == 0xFFFFFFFFFFFFFFFF)
+            {
+                ESP_LOGD(TAG, "sector %d is empty addr: %d", (myRam.flashData_sync.flashAddrTail / SECTOR_SIZE), myRam.flashData_sync.flashAddrTail);
+                myRam.flashData_sync.flash_init_ok = 1;
+                break;
+            }
+            else
+            {
+                myRam.flashData_sync.flashAddrTail += 8;
+            }
+            // delay(1000);
+        }
+    }
+    ESP_LOGD(TAG, "init headAddr: %d tailAddr: %d flash_init: %d", myRam.flashData_sync.flashAddrHead, myRam.flashData_sync.flashAddrTail, myRam.flashData_sync.flash_init_ok);    
     
-    pinMode(27, INPUT_PULLUP);
+    // pinMode(27, INPUT_PULLUP);
 }
 
 void handle_flash_addresses()
@@ -197,7 +235,7 @@ void handle_flash_addresses()
             EEPROM.write(EEPROM_HEAD_FLASH_ADDR_OFFSET + i, headFlashAddr_converted.unmarshall[i]); 
             EEPROM.commit();
         }
-        ESP_LOGD(TAG, "write head addr: %d", headFlashAddr_temp);
+        // ESP_LOGD(TAG, "write head addr: %d", headFlashAddr_temp);
     }
     
 }
@@ -205,12 +243,12 @@ void handle_flash_addresses()
 void handle_sync_flashData()
 {
     handle_flash_addresses();
-    if (digitalRead(27) == 0)
-    {
-        flash.eraseChip();
-        myRam.flashData_sync.sync_state = CLEAR_FLASH_DATA;
-        ESP_LOGD(TAG, "clear flash manually");
-    }
+    // if (digitalRead(27) == 0)
+    // {
+    //     flash.eraseChip();
+    //     myRam.flashData_sync.sync_state = CLEAR_FLASH_DATA;
+    //     ESP_LOGD(TAG, "clear flash manually");
+    // }
     
     static uint32_t t_sync_flash_data;
     static uint32_t t_wait_for_clearing_flash_data;
@@ -218,12 +256,15 @@ void handle_sync_flashData()
     {
     case START_ASSIGN_DATA_TO_FLASH:
         {
-            static uint32_t t_save_offline_data;
-            if (millis() - t_save_offline_data > myRam.pt100_data.sampleRate * 1000)
-            {
-                save_data_offline_to_flash();
-                t_save_offline_data = millis();
-            }
+            // static uint32_t t_save_offline_data;
+            // if (millis() - t_save_offline_data > myRam.pt100_data.sampleRate * 1000)
+            
+                // ESP_LOGD(TAG, "-------------SAVE FLASH DATA-----------------");
+                // save_data_offline_to_flash();
+                // myRam.pt100_data.timer_tick = 0;
+            //     myRam.flashData_sync.flash_save_data_tick = 0;
+            //     // t_save_offline_data = millis();
+            // }
             // if (myRam.flashData_sync.flashAddrTail == 0)
             // {
             //     flash.eraseChip();

@@ -19,10 +19,10 @@ void setup() {
   }
   
   // Check if RTC lost power
-  if (rtc.lostPower()) {
-    Serial.println("RTC lost power, setting the time!");
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-  }
+//   if (rtc.lostPower()) {
+//     Serial.println("RTC lost power, setting the time!");
+//   }
+     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 }
 
 void loop() {

@@ -208,6 +208,12 @@ h1 {
 }
 
 /* History Table */
+
+.history-container {
+    max-height: 420px;   /* or whatever fits your UI */
+    overflow-y: auto;
+}
+
 .history-table {
   width: 100%;
   border-collapse: collapse;

@@ -19,6 +19,11 @@ function handle_data_response_from_devices(devId, response)
     response = JSON.parse(response);
     if(response.cmd == "sampleRate" && response.status == "ok")
     {
-        alert(`Sample rate ${devId} set to ${response.value}`);
+        let devNumber = parseInt(devId.split('-')[1]);
+        console.log(`devNum: ${devNumber}`);
+        if(currentDeviceView === devNumber)
+        {
+            alert(`Sample rate ${devId} set to ${response.value}`);
+        }
     }
 }
