@@ -203,3 +203,4 @@ winnt:notice] [pid 5792:tid 404] AH00424: Parent: Received restart signal -- Res
 [Thu Feb 05 16:10:17.754290 2026] [mpm_winnt:notice] [pid 5916:tid 172] AH00456: Server built: Dec  6 2025 07:20:52
 [Thu Feb 05 16:10:17.754290 2026] [core:notice] [pid 5916:tid 172] AH00094: Command line: 'D:\\Indruino_Projects\\indruino\\company_project\\PT100_Logger_esp32\\server_win\\httpd-2.4.66-251206-Win64-VS17\\Apache24\\bin\\httpd.exe -d D:/Indruino_Projects/indruino/company_project/PT100_Logger_esp32/server_win/httpd-2.4.66-251206-Win64-VS17/Apache24'
 [Thu Feb 05 16:10:17.754290 2026] [mpm_winnt:notice] [pid 5916:tid 172] AH00418: Parent: Created child process 9196
+[Thu Feb 05 16:10:18.447680 2026] [mpm_winnt:notice] [pid 9196:tid 420] AH00354: Child: Starting 64 worker threads.

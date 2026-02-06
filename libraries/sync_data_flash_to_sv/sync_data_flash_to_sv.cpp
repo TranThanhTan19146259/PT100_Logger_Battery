@@ -291,7 +291,7 @@ void handle_sync_flashData()
         }
     case WAIT_TO_SEND_FLASH_DATA_TO_SV:
         {
-            if (millis() - t_sync_flash_data > 2000)
+            if (millis() - t_sync_flash_data > 3000)
             {
                 myRam.flashData_sync.sync_state = START_SEND_FLASH_DATA_TO_SV;
                 t_sync_flash_data = millis();

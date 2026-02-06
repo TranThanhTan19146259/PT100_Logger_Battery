@@ -81,6 +81,22 @@ function sort_table_safe() {
     tbody.appendChild(frag);
 }
 
+function getVisibleTableRows(historyScroll, tbody) {
+    const containerRect = historyScroll.getBoundingClientRect();
+
+    return Array.from(tbody.rows)
+        .filter(row => {
+            const rowRect = row.getBoundingClientRect();
+            return (
+                rowRect.bottom > containerRect.top &&
+                rowRect.top < containerRect.bottom
+            );
+        })
+        .map(row =>
+            Array.from(row.cells).map(cell => cell.textContent.trim())
+        );
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const historyScroll = document.getElementById("historyScroll");
     const tbody = document.getElementById("historyTableBody");
@@ -100,7 +116,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // run sort ONLY after scrolling stops
         scrollTimer = setTimeout(() => {
-            console.log("Sorting after scroll stop");
             sort_table_safe();
         }, 300);
     });
@@ -146,81 +161,47 @@ function generate_history_table()
 }
 
 
-
-let prevData = null;
-
-function isChanged(oldObj, newObj)
-{
-    const oldArr = oldObj?.time_his;
-    const newArr = newObj?.time_his;
-
-    if (oldArr.length !== newArr.length){
-        return true;
-    }
-    return newArr.some((val, i) => val !== oldArr[i]);
-}
-
-
+const historyTimeSet = new Set();
 
 function update_history_table(inputData)
 {
     let his_table = document.getElementById("historyTableBody");
-    // update table rows after adding new data points;
     let lastest_table_rows = his_table.rows.length;
-    
-    /*
-    
-    */
 
-    try{
-        inputData = JSON.parse(inputData)
-        // console.log(`Received: `, inputData.time_his);
+    try {
+        inputData = JSON.parse(inputData);
+        console.log("Received:", inputData.time_his);
+    } catch {
+        return;
     }
-    catch {
 
+    if (!inputData || !inputData.time_his || !inputData.temp_his) return;
+
+    // initialize Set from existing rows (only once)
+    if (historyTimeSet.size === 0) {
+        Array.from(his_table.rows).forEach(row => {
+            const time = row.cells[1]?.textContent.trim();
+            if (time) historyTimeSet.add(time);
+        });
     }
-    // Update specific data points based on time
-    if (inputData && inputData.time_his && inputData.temp_his) {
-        for (let i = 0; i < inputData.time_his.length; i++) {
-            const time = inputData.time_his[i];
-            const temp = inputData.temp_his[i];
-            // let change = false;
-            
-            // if (prevData){
-            //     change = isChanged(prevData, inputData);
-            //         // JSON.stringify(inputData.time_his) != JSON.stringify(prevData.time_his)
-            // }
-            // console.log(inputData);
-            // console.log(prevData);
 
-            inputData.time_his.forEach((time, i) =>{
-                const temp = inputData.temp_his[i];
-                let newRow = his_table.insertRow(-1);
-                // Insert a cell in the row at index 0
-                let noCell = newRow.insertCell(0);
-                let timeCell = newRow.insertCell(1);
-                let tempCell = newRow.insertCell(2);
-                let noText = document.createTextNode(String(i + lastest_table_rows));
-                let timeText = document.createTextNode(String(time));
-                let tempText = document.createTextNode(String(temp));
-                noCell.appendChild(noText);
-                timeCell.appendChild(timeText);
-                tempCell.appendChild(tempText);
-
-            })
-            
-            // if (change || !prevData)
-            // {
-            //     // console.log("Data changed");
-            // }
-            // prevData = structuredClone(inputData);
-
-
-            
+    // ✅ single loop + deduplication
+    inputData.time_his.forEach((time, i) => {
+        if (historyTimeSet.has(time)) {
+            // duplicate → skip
+            return;
         }
-    }
-    // re-arrange history table after getting data from device
-    // sort_table();
+
+        const temp = inputData.temp_his[i];
+
+        let newRow = his_table.insertRow(-1);
+        newRow.insertCell(0).textContent = String(lastest_table_rows++);
+        newRow.insertCell(1).textContent = String(time);
+        newRow.insertCell(2).textContent = String(temp);
+
+        // mark as existing
+        historyTimeSet.add(time);
+    });
 }
 
 function remove_history_table()

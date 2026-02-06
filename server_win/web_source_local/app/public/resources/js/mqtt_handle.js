@@ -30,6 +30,9 @@ function generate_device_data()
     }
 }
 
+let canRespond = true;
+let canRespondHisData = true;
+let lat_flag = false;
 // Connect to MQTT Broker
 function connectMQTT() {
     generate_mqtt_client_id();
@@ -71,16 +74,22 @@ function connectMQTT() {
                 if(lastestDataFromDevices == "status")
                 {
                     let devId = `DEV-${String(deviceNumber).padStart(3, '0')}`;
-                    let topicResLastestData = `Indr_PT100/${devId}/responseStatus` 
-                    // response_lastest_Data = {
-                    //                             time: data.time,
-                    //                             status: "ok"
-                    //                         };
-                    // response_lastest_Data_json = JSON.stringify(response_lastest_Data);
-                    if(message.toString() == "ping")
-                    {
-                        publishMQTT(topicResLastestData,"pong");
+                    let resStatus = `Indr_PT100/${devId}/responseStatus` 
+                    // if (message.toString() !== "ping") return;
+
+                    if (!canRespond) {
+                        return;
                     }
+                
+                    publishMQTT(resStatus, "pong");
+                    lat_flag = true;
+                
+                    canRespond = false;
+                    // unlock after 5 seconds
+                    setTimeout(() => {
+                        canRespond = true;
+                        console.log("Ready for next ping");
+                    }, 5000);
                 }
                 if(lastestDataFromDevices == "lastestData")
                 {
@@ -128,9 +137,21 @@ function connectMQTT() {
                     let topicResHIsData = `Indr_PT100/${devId}/responseHisData` 
                     response_his_Data = {status: "ok"};
                     response_his_Data_json = JSON.stringify(response_his_Data);
-                    publishMQTT(topicResHIsData,response_his_Data_json);
                     update_new_data_to_database(deviceNumber, data);
+                    if (!canRespondHisData) {
+                        return;
+                    }
                     
+                    publishMQTT(topicResHIsData,response_his_Data_json);
+                    // publishMQTT(resStatus, "pong");
+                    lat_flag = true;
+                
+                    canRespondHisData = false;
+                    // unlock after 5 seconds
+                    setTimeout(() => {
+                        canRespondHisData = true;
+                        console.log("Ready for next resposne HisData");
+                    }, 10);
                     if (currentDeviceView === deviceNumber) {
                             mqtt_data_input = message.toString();
                             update_history_table(mqtt_data_input);
@@ -225,7 +246,7 @@ function updateDeviceDisplay(deviceNumber) {
 
 function publishMQTT(topic, message)
 {
-    mqttClient.publish(topic, message, (err) => {
+    mqttClient.publish(topic, message,{ retain: false }, (err) => {
         if (err) {
             console.error('Failed to publish message:', err);
         } else {

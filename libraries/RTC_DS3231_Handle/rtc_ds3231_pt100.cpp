@@ -54,6 +54,8 @@ void handle_rtc_ds3231()
     static uint8_t secondCounter = 0; 
 
     char buf_date_string[50];
+    char buf_time_string[50];
+
     if (now.isValid())
     {
         if (timeToRead) 
@@ -67,17 +69,23 @@ void handle_rtc_ds3231()
                 // myRam.rtc_time.rtcTime.tm_year = now.year(); 
                 // myRam.rtc_time.rtcTime.tm_mon  = now.month(); 
                 // myRam.rtc_time.rtcTime.tm_mday = now.day(); 
-                myRam.flashData_sync.flash_save_data_tick = 1;
+                // myRam.flashData_sync.flash_save_data_tick = 1;
+                now = rtc.now();
                 ESP_LOGD(TAG,"DAY: %d day ram: %d FLASH_TICK %d", now.day(), myRam.rtc_time.rtcTime.tm_mday,myRam.flashData_sync.flash_save_data_tick);
                     sprintf(buf_date_string, "%d/%d/%d",            now.day(),
                                                                     now.month(), 
                                                                     now.year()
                 );
-                now = rtc.now();
                 myRam.rtc_time.rtcDateString = buf_date_string; 
                 myRam.rtc_time.rtcTime.tm_hour = now.hour(); 
                 myRam.rtc_time.rtcTime.tm_min  = now.minute(); 
                 myRam.rtc_time.rtcTime.tm_sec  = now.second();
+
+                // ESP_LOGD(TAG, "get time flag: %d", myRam.ntp_time.get_time_ok);
+                sprintf(buf_time_string, "%d:%d:%d",    myRam.rtc_time.rtcTime.tm_hour,
+                                                        myRam.rtc_time.rtcTime.tm_min, 
+                                                        myRam.rtc_time.rtcTime.tm_sec
+                );
                 // myRam.mqtt_config_data.mqtt_tick = 1;
                 secondCounter = 0;
             }
@@ -111,12 +119,7 @@ void handle_rtc_ds3231()
     }
 
 
-    char buf_time_string[50];
-    // ESP_LOGD(TAG, "get time flag: %d", myRam.ntp_time.get_time_ok);
-    sprintf(buf_time_string, "%d:%d:%d",            myRam.rtc_time.rtcTime.tm_hour,
-                                                    myRam.rtc_time.rtcTime.tm_min, 
-                                                    myRam.rtc_time.rtcTime.tm_sec
-            );
+
 
     myRam.rtc_time.rtcTimeString = buf_time_string; 
     myRam.rtc_time.rtcDateTimeString = String(buf_date_string) + " " + String(buf_time_string);  

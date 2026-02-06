@@ -7,11 +7,11 @@ void WiFiEvent(WiFiEvent_t event)
     {
     case SYSTEM_EVENT_STA_DISCONNECTED:
         Serial.println("Lost current wifi");
-        myRam.wifi_config_data.is_wifi_connected = 0;
+        // myRam.wifi_config_data.is_wifi_connected = 0;
         break;
 
     case SYSTEM_EVENT_STA_GOT_IP:
-        myRam.wifi_config_data.is_wifi_connected = 1;
+        // myRam.wifi_config_data.is_wifi_connected = 1;
         break;
     }
 }
@@ -19,7 +19,7 @@ void initNetwork()
 {
     initWebServer();
     pinMode(BUTTON_SIMULATE_NETWORK_CONNECT, INPUT_PULLUP);
-    WiFi.onEvent(WiFiEvent);
+    // WiFi.onEvent(WiFiEvent);
 }
 
 void handleNetwork()
