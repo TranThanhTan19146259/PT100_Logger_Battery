@@ -7,6 +7,8 @@ TaskHandle_t RTC;
 TaskHandle_t SaveOfflineDataTask;
 TaskHandle_t MqttClientControlTask;
 TaskHandle_t MqttAckCheckTask;
+TaskHandle_t NetworkTask;
+// TaskHandle_t NetworkTask;
 
 hw_timer_t *My_timer = NULL;
 
@@ -25,7 +27,7 @@ void control_sleep_mode()
       {
         t_enter_sleep_mode = millis();
         sleep_state = 1;
-        ESP_LOGD(TAG, "Start entering sleep mode !!!!");
+        // ESP_LOGD(TAG, "Start entering sleep mode !!!!");
         break;
       }
     case 1:
@@ -43,7 +45,7 @@ void control_sleep_mode()
       }
     case 2:
       {
-        ESP_LOGD(TAG, "Sleep for %d seconds",myRam.pt100_data.time_get_data);
+        // ESP_LOGD(TAG, "Sleep for %d seconds",myRam.pt100_data.time_get_data);
         myRam.working_status.esp_working_modes = SLEEP;
         // esp_sleep_enable_ext0_wakeup(GPIO_NUM_26, 0); 
         esp_sleep_enable_ext0_wakeup(GPIO_NUM_13, 0); 
@@ -190,6 +192,16 @@ void handle_change_sampleRate()
   
 }
 
+// void network_handle_task_code(void *parameter)
+// {
+//   initNetwork();
+//   while (1)
+//   {
+//     handleNetwork();
+//     yield();
+//   }
+  
+// }
 // void save_flash_task_code(void *parameter)
 // {
 //   while (1)
@@ -241,10 +253,11 @@ void init_hw()
     // delay(2000);
     xTaskCreatePinnedToCore(sync_FlashData_task_code,"sync_flash_data",8096,NULL,1,&Sync_FlashData,1);  
     xTaskCreatePinnedToCore(mqtt_ack_check_status,"mqtt_ack_check",4096,NULL,1,&MqttAckCheckTask,1);   
+    xTaskCreatePinnedToCore(mqtt_handle_client_control_task_code,"mqtt_client_control",8096,NULL,1,&MqttClientControlTask,1);   
     xTaskCreatePinnedToCore(mqtt_handle_task_code,"mqtt",10000,NULL,1,&MqttTask,1);   
     xTaskCreatePinnedToCore(time_ntp_task_code,"ntp",4096,NULL,1,&GetTimeTask,1);   
-    xTaskCreatePinnedToCore(rtc_handle_task_code,"rtc",4096,NULL,2,&RTC,0);
-    xTaskCreatePinnedToCore(mqtt_handle_client_control_task_code,"mqtt_client_control",8096,NULL,1,&MqttClientControlTask,1);   
+    xTaskCreatePinnedToCore(rtc_handle_task_code,"rtc",4096,NULL,1,&RTC,0);
+    // xTaskCreatePinnedToCore(network_handle_task_code,"network",8096,NULL,1,&NetworkTask,1);
 }
 
 void handle_hw()

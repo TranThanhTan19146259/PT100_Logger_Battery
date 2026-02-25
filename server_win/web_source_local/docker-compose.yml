@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   ntp:
     image: cturra/ntp
@@ -13,11 +14,26 @@ services:
       - SYS_TIME
       - SYS_NICE
     network_mode: host
+
   mongodb:
     image: mongo:4.4
     container_name: mongodb
     ports:
       - "27017:27017"
+    networks:
+      - app-network
+
+  emqx:
+    image: emqx/emqx:latest
+    container_name: emqx
+    restart: unless-stopped
+    ports:
+      - "1883:1883"     # MQTT
+      - "8083:8083"     # MQTT over WebSocket
+      - "18083:18083"   # Dashboard
+    volumes:
+      - emqx_data:/opt/emqx/data
+      - emqx_log:/opt/emqx/log
     networks:
       - app-network
 
@@ -32,8 +48,13 @@ services:
     command: sh -c "cd /app && ls -la && npm install && node /app/server.js"
     depends_on:
       - mongodb
+      - emqx
     networks:
       - app-network
 
 networks:
   app-network:
+
+volumes:
+  emqx_data:
+  emqx_log:

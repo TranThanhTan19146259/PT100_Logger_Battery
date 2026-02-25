@@ -22,27 +22,7 @@ function switchTab(tabName) {
   }
 }
 
-let dev_status = [];// check devices online or offline
-let intervalDeviceTimeout = [];
-function devices_status_handle(devNumber)
-{
-    const statusBadge = document.getElementById('deviceStatus');
-    let dev_timeout = 15000;
-    let dev_btn = document.getElementsByClassName("device-btn");
-    dev_btn[devNumber - 1].style.background = "rgb(62, 235, 27)";
-    dev_status[devNumber - 1] = 1;
-    clearInterval(intervalDeviceTimeout[devNumber - 1]);
-    statusBadge.textContent = "Online";
-    statusBadge.className = `status-badge status-online`;
-    intervalDeviceTimeout[devNumber - 1] = setInterval(function checkTimeout(){
-        console.log(`device ${devNumber} timeout`);
-        dev_btn[devNumber - 1].style.background = "gray";
-        statusBadge.textContent = "Offline";
-        statusBadge.className = `status-badge status-offline`;
-        clearInterval(intervalDeviceTimeout[devNumber - 1]);
-    }, dev_timeout);
-    
-}
+
 
 
 

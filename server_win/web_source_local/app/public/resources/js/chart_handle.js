@@ -4,7 +4,14 @@ let myChart;
 let mqtt_data_input;
 let chart_interval_addData;
 let chart_interval_loadInitialData;
+let isDataOutOfRange = 0;
 
+//convert timestamp to seconds 
+function timeToSeconds(t)
+{
+    const [h, m, s] = t.split(":").map(Number);
+    return h * 3600 + m * 60 + s;
+}
 
 // Function to load initial data - accessible from other JS files
 function loadInitialData(inputData) {
@@ -15,14 +22,29 @@ function loadInitialData(inputData) {
     catch {
 
     }
+    // Check lastest data is inside time range
+    // console.log(`data range min: ${myChart.data.labels[0]}`);
+    // console.log(`data range max: ${myChart.data.labels[myChart.data.labels.length - 1]}`);
+    // console.log(`time min: ${timeToSeconds(myChart.data.labels[0])}`)
+    // console.log(`time max: ${timeToSeconds(myChart.data.labels[myChart.data.labels.length - 1])}`)
+    let time_min, time_max;
+    time_min = timeToSeconds(myChart.data.labels[0]);
+    time_max = timeToSeconds(myChart.data.labels[myChart.data.labels.length - 1]);
     // Update specific data points based on time
     if (inputData && inputData.time_his && inputData.temp_his) {
+
+
         for (let i = 0; i < inputData.time_his.length; i++) {
-            
             
             const time = inputData.time_his[i].split(' ')[1];
             const temp = inputData.temp_his[i];
-
+            if(timeToSeconds(time) < time_min || timeToSeconds(inputData.time_his[i]) > time_max)
+            {
+                console.log("out of range");
+                isDataOutOfRange = 1;
+                return;
+            }
+            isDataOutOfRange = 0;
             // Find if this time already exists in the chart
             const existingIndex = myChart.data.labels.indexOf(time);
 
@@ -160,7 +182,13 @@ function load_chart()
             String(now.getSeconds()).padStart(2, '0');
         lastest_data_updated = parseInt(lastest_data_updated);
         myChart.data.labels.push(timeLabel);
+        // if(isDataOutOfRange == 0)
         myChart.data.datasets[0].data.push(lastest_data_updated);
+
+        // console.log(`data range min: ${myChart.data.labels[0]}`);
+        // console.log(`data range max: ${myChart.data.labels[myChart.data.labels.length - 1]}`);
+        // console.log(`time min: ${timeToSeconds(myChart.data.labels[0])}`)
+        // console.log(`time max: ${timeToSeconds(myChart.data.labels[myChart.data.labels.length - 1])}`)
         // Remove old data if we have too many points
         if (myChart.data.labels.length > maxDataPoints) {
             myChart.data.labels.shift();

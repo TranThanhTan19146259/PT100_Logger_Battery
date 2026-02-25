@@ -1,5 +1,6 @@
 #include "rtc_ds3231_pt100.h"
 RTC_DS3231 rtc;
+SemaphoreHandle_t i2cMutex = NULL;
 
 int8_t compare_two_time_sources(struct tm *timeSource1, struct tm *timeSource2)
 {
@@ -17,9 +18,22 @@ void IRAM_ATTR sqwISR() {
   timeToRead = true;
 }
 
+
+void init_i2c_mutex()
+{
+    i2cMutex = xSemaphoreCreateMutex();
+
+    if (i2cMutex == NULL) {
+        ESP_LOGE(TAG, "Failed to create I2C mutex");
+        abort();   // or handle safely
+    }
+}
+
 void init_rtc_ds3231()
 {
-    Wire.begin(I2C_SDA, I2C_SCL);
+    init_i2c_mutex();
+    // Wire.begin();
+    Wire.begin(I2C_SDA, I2C_SCL, 100000);
     // yield();
     if (!rtc.begin())
     {
@@ -32,11 +46,12 @@ void init_rtc_ds3231()
     // Setup interrupt pin
     pinMode(SQWinput, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(SQWinput), sqwISR, FALLING);
-    delay(5000);
     if (rtc.lostPower())
     {
         ESP_LOGD(TAG, "rtc lost power");
+        Serial.println("rtc lost power");
     }
+    delay(5000);
     
     // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
     // else
@@ -56,67 +71,71 @@ void handle_rtc_ds3231()
     char buf_date_string[50];
     char buf_time_string[50];
 
-    if (now.isValid())
-    {
+    // if (now.isValid())
+    // {
         if (timeToRead) 
         {
             timeToRead = false;
             secondCounter++;
-            // Print time every N seconds
+            // xSemaphoreTake(i2cMutex, 10);
+            now = rtc.now();
+            
+            if (myRam.wifi_config_data.is_wifi_connected && rtc.lostPower())
+            {
+                // if (!rtc.lostPower()) return; // when rtc lost power adjust time again
+                
+                if (compare_two_time_sources(&myRam.rtc_time.rtcTime, &myRam.ntp_time.ntpTime) != 0 && myRam.ntp_time.get_time_ok)
+                {
+                    // start synchronizing time source server to stc
+                    myRam.rtc_time.rtcTime.tm_hour = myRam.ntp_time.ntpTime.tm_hour; 
+                    myRam.rtc_time.rtcTime.tm_min  = myRam.ntp_time.ntpTime.tm_min; 
+                    myRam.rtc_time.rtcTime.tm_sec  = myRam.ntp_time.ntpTime.tm_sec;
 
+                    myRam.rtc_time.rtcTime.tm_year = myRam.ntp_time.ntpTime.tm_year; 
+                    myRam.rtc_time.rtcTime.tm_mon  = myRam.ntp_time.ntpTime.tm_mon; 
+                    myRam.rtc_time.rtcTime.tm_mday = myRam.ntp_time.ntpTime.tm_mday; 
+                    DateTime dt_set(myRam.ntp_time.ntpTime.tm_year, 
+                                    myRam.ntp_time.ntpTime.tm_mon,
+                                    myRam.ntp_time.ntpTime.tm_mday,
+                                    myRam.ntp_time.ntpTime.tm_hour, 
+                                    myRam.ntp_time.ntpTime.tm_min,
+                                    myRam.ntp_time.ntpTime.tm_sec
+                    );
+                    rtc.adjust(dt_set);
+                    ESP_LOGD(TAG, "-----------------START SYNC DATA--------------------");
+                    Serial.println("-----------------START SYNC DATA--------------------");
+                }
+            }
+
+            // xSemaphoreGive(i2cMutex);
             if (secondCounter >= myRam.pt100_data.sampleRate) {
+                if (!now.isValid()) return;
                 myRam.rtc_time.rtc_tick = 1;
                 // myRam.rtc_time.rtcTime.tm_year = now.year(); 
                 // myRam.rtc_time.rtcTime.tm_mon  = now.month(); 
                 // myRam.rtc_time.rtcTime.tm_mday = now.day(); 
                 // myRam.flashData_sync.flash_save_data_tick = 1;
-                now = rtc.now();
-                ESP_LOGD(TAG,"DAY: %d day ram: %d FLASH_TICK %d", now.day(), myRam.rtc_time.rtcTime.tm_mday,myRam.flashData_sync.flash_save_data_tick);
-                    sprintf(buf_date_string, "%d/%d/%d",            now.day(),
-                                                                    now.month(), 
-                                                                    now.year()
+                sprintf(buf_date_string, "%d/%d/%d",            now.day(),
+                                                                now.month(), 
+                                                                now.year()
                 );
                 myRam.rtc_time.rtcDateString = buf_date_string; 
                 myRam.rtc_time.rtcTime.tm_hour = now.hour(); 
                 myRam.rtc_time.rtcTime.tm_min  = now.minute(); 
                 myRam.rtc_time.rtcTime.tm_sec  = now.second();
 
-                // ESP_LOGD(TAG, "get time flag: %d", myRam.ntp_time.get_time_ok);
                 sprintf(buf_time_string, "%d:%d:%d",    myRam.rtc_time.rtcTime.tm_hour,
                                                         myRam.rtc_time.rtcTime.tm_min, 
                                                         myRam.rtc_time.rtcTime.tm_sec
                 );
-                // myRam.mqtt_config_data.mqtt_tick = 1;
                 secondCounter = 0;
             }
         }
         
-    }
+    // }
     
 
-    if (myRam.wifi_config_data.is_wifi_connected)
-    {
-        if (compare_two_time_sources(&myRam.rtc_time.rtcTime, &myRam.ntp_time.ntpTime) != 0 && myRam.ntp_time.get_time_ok)
-        {
-            // start synchronizing time source server to stc
-            myRam.rtc_time.rtcTime.tm_hour = myRam.ntp_time.ntpTime.tm_hour; 
-            myRam.rtc_time.rtcTime.tm_min  = myRam.ntp_time.ntpTime.tm_min; 
-            myRam.rtc_time.rtcTime.tm_sec  = myRam.ntp_time.ntpTime.tm_sec;
-
-            myRam.rtc_time.rtcTime.tm_year = myRam.ntp_time.ntpTime.tm_year; 
-            myRam.rtc_time.rtcTime.tm_mon  = myRam.ntp_time.ntpTime.tm_mon; 
-            myRam.rtc_time.rtcTime.tm_mday = myRam.ntp_time.ntpTime.tm_mday; 
-            DateTime dt_set(myRam.ntp_time.ntpTime.tm_year, 
-                            myRam.ntp_time.ntpTime.tm_mon,
-                            myRam.ntp_time.ntpTime.tm_mday,
-                            myRam.ntp_time.ntpTime.tm_hour, 
-                            myRam.ntp_time.ntpTime.tm_min,
-                            myRam.ntp_time.ntpTime.tm_sec
-            );
-            rtc.adjust(dt_set);
-            ESP_LOGD(TAG, "-----------------START SYNC DATA--------------------");
-        }
-    }
+   
 
 
 
@@ -131,50 +150,66 @@ void handle_rtc_ds3231()
         Serial.println(myRam.rtc_time.rtcTimeString);
         Serial.println(myRam.rtc_time.rtcDateString);
         Serial.println(myRam.rtc_time.rtcDateTimeString);
+        Serial.printf("sector idx: %d", myRam.flashData_sync.total_sector_used);
         static uint32_t t_save_offline_data;
         Serial.println("---------------------------TICK TEST--------------------------------");
         ESP_LOGD(TAG,"---------------------------TICK TEST--------------------------------");
+        Serial.println(myRam.flashData_sync.sync_state);
         ESP_LOGD(TAG,"STATE %d", myRam.flashData_sync.sync_state);
         ESP_LOGD(TAG,"ESP RAM MEMORY: %d reset count %d", ESP.getFreeHeap(), myRam.pt100_data.reset_times);
         // ESP_LOGD(TAG,"MQTT TICK: %d FLASH TICK %d", myRam.mqtt_config_data.mqtt_tick, myRam.flashData_sync.flash_save_data_tick);
         // ESP_LOGD(TAG,"MQTT Connect: %d", myRam.mqtt_config_data.mqtt_tick, myRam.flashData_sync.flash_save_data_tick);
-        if (myRam.flashData_sync.sync_state == START_ASSIGN_DATA_TO_FLASH)
-        {
-            Serial.println("START ASSIGNING DATA");
-            ESP_LOGD(TAG, "START ASSIGNING DATA");
-            save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
-            // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
-            // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
-            // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
-            // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
-            // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
-            // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
-            // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
-            // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
-            // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
-            // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
-        }
-        send_lastestData_to_sv(myRam.rtc_time.rtcDateTimeString);
-        if (myRam.mqtt_state == WAIT_FOR_DATA_RESPONSE)
-        {
-            {
-                ESP_LOGD(TAG,"Wait for response mqtt %d", myRam.flashData_sync.response_from_server_for_lastestData);
-                // had response from server
-                if (myRam.flashData_sync.response_from_server_for_lastestData == 0)
-                {
-                    // myRam.flashData_sync.response_from_server_for_lastestData = 0;
-                    ESP_LOGD(TAG,"No data response => save data to flash");
-                    // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
-                }
-                else
-                {
+        // if (myRam.flashData_sync.sync_state == START_ASSIGN_DATA_TO_FLASH)
+        // {
+        //     Serial.println("START ASSIGNING DATA");
+        //     ESP_LOGD(TAG, "START ASSIGNING DATA");
+        //     save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        //     // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        //     // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        //     // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        //     // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        //     // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        //     // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        //     // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        //     // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        //     // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        //     // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        // }
+        // Serial.println("START ASSIGNING DATA");
+        // ESP_LOGD(TAG, "START ASSIGNING DATA");
+        save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        // send_lastestData_to_sv(myRam.rtc_time.rtcDateTimeString);
+        // if (myRam.mqtt_state == WAIT_FOR_DATA_RESPONSE)
+        // {
+        //     {
+        //         ESP_LOGD(TAG,"Wait for response mqtt %d", myRam.flashData_sync.response_from_server_for_lastestData);
+        //         // had response from server
+        //         if (myRam.flashData_sync.response_from_server_for_lastestData == 0)
+        //         {
+        //             // myRam.flashData_sync.response_from_server_for_lastestData = 0;
+        //             ESP_LOGD(TAG,"No data response => save data to flash");
+        //             // save_data_offline_to_flash(myRam.rtc_time.rtcDateTimeString);
+        //         }
+        //         else
+        //         {
                     
-                }
-                myRam.flashData_sync.response_from_server_for_lastestData = 0;
-                myRam.mqtt_state = DONE_HANDLE_SENT_MSG;
-            }
-        }
+        //         }
+        //         myRam.flashData_sync.response_from_server_for_lastestData = 0;
+        //         myRam.mqtt_state = DONE_HANDLE_SENT_MSG;
+        //     }
+        // }
         // myRam.flashData_sync.flash_save_data_tick = 1;
+        myRam.mqtt_config_data.mqtt_tick = 1;
         myRam.rtc_time.rtc_tick = 0;
     }
 }

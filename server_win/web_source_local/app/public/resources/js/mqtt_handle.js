@@ -10,10 +10,21 @@ let currentDeviceView = null;
 
 // Device data storage - shared with device-list.js
 const deviceData = {};
+let canRespond = [];
 
 // Initialize device data
 function generate_device_data()
 {
+    // canRespond[4] = true;
+    // canRespond[5] = true;
+    // canRespond[6] = true;
+    // canRespond[0] = true;
+    // canRespond[0] = true;
+    // canRespond[0] = true;
+    for(let i = 0; i < total_devices; i++)
+    {
+        canRespond[i] = true;
+    }
     for (let i = 1; i <= total_devices; i++) {
         deviceData[i] = {
             name: `Device ${i}`,
@@ -30,11 +41,13 @@ function generate_device_data()
     }
 }
 
-let canRespond = true;
+// let canRespond[50] = true;
+
 let canRespondHisData = true;
 let lat_flag = false;
 // Connect to MQTT Broker
 function connectMQTT() {
+
     generate_mqtt_client_id();
     try {
             mqttClient = mqtt.connect(MQTT_BROKER, {
@@ -76,19 +89,20 @@ function connectMQTT() {
                     let devId = `DEV-${String(deviceNumber).padStart(3, '0')}`;
                     let resStatus = `Indr_PT100/${devId}/responseStatus` 
                     // if (message.toString() !== "ping") return;
-
-                    if (!canRespond) {
+                    
+                    // console.log(`pong for dev ${devId} canresponse ${canRespond[deviceNumber - 1]}`);
+                    if (!canRespond[deviceNumber - 1]) {
                         return;
                     }
-                
                     publishMQTT(resStatus, "pong");
-                    lat_flag = true;
+                    // lat_flag = true;
                 
-                    canRespond = false;
+                    canRespond[deviceNumber - 1] = false;
+                    // console.log(`pong for dev ${devId} canresponse ${canRespond[deviceNumber - 1]}`);
                     // unlock after 5 seconds
                     setTimeout(() => {
-                        canRespond = true;
-                        console.log("Ready for next ping");
+                        canRespond[deviceNumber - 1] = true;
+                        console.log(`Ready for next ping for dev ${devId}`);
                     }, 5000);
                 }
                 if(lastestDataFromDevices == "lastestData")
@@ -106,9 +120,12 @@ function connectMQTT() {
                                             };
                     response_lastest_Data_json = JSON.stringify(response_lastest_Data);
                     publishMQTT(topicResLastestData,response_lastest_Data_json);
+                    data.temp *= 1.0;
+                    console.log(`data temp: ${data.temp}`);
+                    
                     // Update device data
                     if (deviceData[deviceNumber]) {
-                        deviceData[deviceNumber].temperature = data.temp || '--';
+                        deviceData[deviceNumber].temperature = parseFloat(data.temp);
                         deviceData[deviceNumber].time = data.time || '--';
                         deviceData[deviceNumber].status = 'online';
                         deviceData[deviceNumber].ip = data.ip;
@@ -121,6 +138,7 @@ function connectMQTT() {
                         if (currentDeviceView === deviceNumber) {
                             mqtt_data_input = message.toString();
                             update_history_table(mqtt_data_input);
+                            // devices_status_handle(deviceNumber);
                             updateDeviceDisplay(deviceNumber);
                         }
                     }
@@ -138,20 +156,20 @@ function connectMQTT() {
                     response_his_Data = {status: "ok"};
                     response_his_Data_json = JSON.stringify(response_his_Data);
                     update_new_data_to_database(deviceNumber, data);
-                    if (!canRespondHisData) {
-                        return;
-                    }
+                    // if (!canRespondHisData) {
+                    //     return;
+                    // }
                     
                     publishMQTT(topicResHIsData,response_his_Data_json);
                     // publishMQTT(resStatus, "pong");
-                    lat_flag = true;
+                    // lat_flag = true;
                 
-                    canRespondHisData = false;
-                    // unlock after 5 seconds
-                    setTimeout(() => {
-                        canRespondHisData = true;
-                        console.log("Ready for next resposne HisData");
-                    }, 10);
+                    // canRespondHisData = false;
+                    // // unlock after 5 seconds
+                    // setTimeout(() => {
+                    //     canRespondHisData = true;
+                    //     console.log("Ready for next resposne HisData");
+                    // }, 10);
                     if (currentDeviceView === deviceNumber) {
                             mqtt_data_input = message.toString();
                             update_history_table(mqtt_data_input);
@@ -179,6 +197,48 @@ function connectMQTT() {
     } catch (error) {
         console.error('Failed to connect to MQTT broker:', error);
     }
+}
+
+
+let dev_status = [];// check devices online or offline
+let intervalDeviceTimeout = [];
+function devices_status_handle(devNumber)
+{
+    // const statusBadge = document.getElementById('deviceStatus');
+    const statusBadge = document.getElementById('deviceStatus');
+    // statusBadge.textContent = device.status.charAt(0).toUpperCase() + device.status.slice(1);
+    // statusBadge.className = `status-badge status-${device.status}`;
+    const device = deviceData[devNumber];
+    let dev_timeout = 15000;
+    let dev_btn = document.getElementsByClassName("device-btn");
+    dev_btn[devNumber - 1].style.background = "rgb(62, 235, 27)";
+    // dev_status[devNumber - 1] = 1;
+    clearInterval(intervalDeviceTimeout[devNumber - 1]);
+    device.status = "online";
+    statusBadge.textContent = device.status.charAt(0).toUpperCase() + device.status.slice(1);
+    statusBadge.className = `status-badge status-${device.status}`;
+    // if(currentDeviceView == devNumber)
+    // {
+    //     console.log(`${currentDeviceView} : ${devNumber}`)
+    //     statusBadge.textContent = "Online";
+    //     statusBadge.className = `status-badge status-online`;
+    // }
+    intervalDeviceTimeout[devNumber - 1] = setInterval(function checkTimeout(){
+        console.log(`device ${devNumber} timeout`);
+        dev_btn[devNumber - 1].style.background = "gray";
+        device.status = "offline";
+        statusBadge.textContent = device.status.charAt(0).toUpperCase() + device.status.slice(1);
+        statusBadge.className = `status-badge status-${device.status}`;
+        // if(currentDeviceView == devNumber)
+        // {
+        //     // statusBadge.textContent = "Online";
+        //     // statusBadge.className = `status-badge status-online`;
+        //     statusBadge.textContent = "Offline";
+        //     statusBadge.className = `status-badge status-offline`;
+        // }
+        clearInterval(intervalDeviceTimeout[devNumber - 1]);
+    }, dev_timeout);
+    
 }
 
 // Update device display when viewing details

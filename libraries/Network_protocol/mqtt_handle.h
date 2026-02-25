@@ -30,7 +30,7 @@
 
 #define MQTT_SERVER_TIMEOUT_COUNT 5 
 #define MQTT_MAX_BUFFER 2048
-#define MAX_BUFFER_DATA_POINTS_SEND_TO_SV 20    
+#define MAX_BUFFER_DATA_POINTS_SEND_TO_SV 16 // ước số của 512    
 
 
 void initMqtt();

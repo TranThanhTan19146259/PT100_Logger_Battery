@@ -5,7 +5,10 @@
 #include "Ram.h"
 #include "Rom.h"
 #define TOTAL_SECTORS 4096
+// #define SECTOR_SIZE 4096 // 4KB
+// #define TOTAL_SECTORS 5
 #define SECTOR_SIZE 4096 // 4KB
+#define TIME_SYNC_FLASH_TO_SV 2000// ms
 
 uint32_t convertHumanDateToUnixTime(String dateTime);
 void convertUnixTimeToHumanDate(uint32_t unixTime, struct tm *output_tm);

@@ -36,6 +36,7 @@ typedef struct Mqtt_config_data
     String username;
     String password;
     bool isConnectToBroker;
+    bool isConnectToBrokerAuto;
     volatile bool mqttConnection;
     String devId;
     bool mqtt_tick;
@@ -100,9 +101,12 @@ typedef enum state_sync_FlashData_backup
     START_SYNC_FLASH_DATA_TO_SV,
     WAIT_TO_SEND_FLASH_DATA_TO_SV,
     START_SEND_FLASH_DATA_TO_SV,
+    WAIT_TO_SEND_NEXT_FLASH_DATA_TO_SV,
+    DONE_SEND_FLASH_DATA_TO_SEVER,
     CLEAR_FLASH_DATA,
     WAIT_FOR_CLEARING_FLASH_DATA,
-    DONE_SYNC_FLASH_DATA_TO_SV
+    DONE_SYNC_FLASH_DATA_TO_SV,
+    DISCONNECT_TO_SV,
 
 } state_sync_FlashData_backup_e;
 
@@ -125,6 +129,7 @@ typedef struct sync_Flashdata_sv_backup
     bool response_from_server_for_lastestData = 0; // online data stream
     bool flash_init_ok = 0;
     volatile bool flash_save_data_tick;
+    volatile bool is_flash_data_under_mqtt_buffer;
 } sync_Flashdata_sv_backup_t;
 
 typedef struct Rtc_time
@@ -133,7 +138,7 @@ typedef struct Rtc_time
     String rtcDateString;
     String rtcDateTimeString;
     struct tm rtcTime;
-    bool rtc_tick;
+    volatile bool rtc_tick;
     bool init_ok;
 } Rtc_time_t;
 

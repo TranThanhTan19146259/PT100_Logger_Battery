@@ -19,22 +19,22 @@ void initNetwork()
 {
     initWebServer();
     pinMode(BUTTON_SIMULATE_NETWORK_CONNECT, INPUT_PULLUP);
-    // WiFi.onEvent(WiFiEvent);
+    WiFi.onEvent(WiFiEvent);
 }
 
 void handleNetwork()
 {
     static bool now_wifi_status, last_wifi_status;
-    if (digitalRead(BUTTON_SIMULATE_NETWORK_CONNECT) == 1)
-    {
+    // if (digitalRead(BUTTON_SIMULATE_NETWORK_CONNECT) == 1)
+    // {
         if (myRam.wifi_config_data.wifi_ap_sta == 1)
         {
             static uint32_t t_print_debug;
-            if (millis() - t_print_debug > 1000)
-            {
-                ESP_LOGD(TAG, "wifi status: %d", myRam.wifi_config_data.is_wifi_connected);
-                t_print_debug = millis();
-            }
+            // if (millis() - t_print_debug > 1000)
+            // {
+            //     ESP_LOGD(TAG, "wifi status: %d", myRam.wifi_config_data.is_wifi_connected);
+            //     t_print_debug = millis();
+            // }
 
             if (WiFi.status() == WL_CONNECTED)
             {
@@ -75,35 +75,35 @@ void handleNetwork()
                     Serial.println(myRam.wifi_config_data.STA_IP);
                     Serial.print("CONNECTED TO ");
                     Serial.println(myRam.wifi_config_data.ssid_sta);
-                    String static_ip = myRam.wifi_config_data.STA_IP;
-                    char *token = strtok((char *)static_ip.c_str(), "."); // get sta ip
-                    int idx = 0;
-                    uint16_t ip[4];
-                    while (token != NULL)
-                    {
-                        ip[idx] = atoi(token);
-                        token = strtok(NULL, ".");
-                        ++idx;
-                    }
-                    ESP_LOGD(TAG, "static ip: %s", myRam.wifi_config_data.STA_IP.c_str());
-                    ESP_LOGD(TAG, "splitted ip: %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+                    // String static_ip = myRam.wifi_config_data.STA_IP;
+                    // char *token = strtok((char *)static_ip.c_str(), "."); // get sta ip
+                    // int idx = 0;
+                    // uint16_t ip[4];
+                    // while (token != NULL)
+                    // {
+                    //     ip[idx] = atoi(token);
+                    //     token = strtok(NULL, ".");
+                    //     ++idx;
+                    // }
+                    // ESP_LOGD(TAG, "static ip: %s", myRam.wifi_config_data.STA_IP.c_str());
+                    // ESP_LOGD(TAG, "splitted ip: %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
                 }
                 last_wifi_status = now_wifi_status;
             }
         }
-    }
-    else
-    {
-        static uint32_t t_count_disconnect;
-        myRam.wifi_config_data.is_wifi_connected = 0;
-        if (millis() - t_count_disconnect > 5000)
-        {
-            WiFi.mode(WIFI_STA);
-            WiFi.begin("SIMULATE SSID", "SIMULATE SSID");
-            Serial.print("CONNECTING TO CONNECTED TO ");
-            Serial.println("SIMULATE SSID");
-            t_count_disconnect = millis();
-        }
-        myRam.wifi_config_data.is_wifi_connected = 0;
-    }
+    // }
+    // else
+    // {
+    //     static uint32_t t_count_disconnect;
+    //     myRam.wifi_config_data.is_wifi_connected = 0;
+    //     if (millis() - t_count_disconnect > 5000)
+    //     {
+    //         WiFi.mode(WIFI_STA);
+    //         WiFi.begin("SIMULATE SSID", "SIMULATE SSID");
+    //         Serial.print("CONNECTING TO CONNECTED TO ");
+    //         Serial.println("SIMULATE SSID");
+    //         t_count_disconnect = millis();
+    //     }
+    //     myRam.wifi_config_data.is_wifi_connected = 0;
+    // }
 }

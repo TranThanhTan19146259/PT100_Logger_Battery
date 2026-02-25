@@ -18,7 +18,7 @@ void init_Ntp()
 void handle_Ntp()
 {
     struct tm timeinfo;
-    if(!getLocalTime(&timeinfo)){
+    if(!getLocalTime(&timeinfo, 5000)){
         Serial.print("Failed to obtain time at NTP server: ");
         Serial.println(ntpServer);
         myRam.ntp_time.get_time_ok = 0;
@@ -52,13 +52,14 @@ void handle_Ntp()
     myRam.ntp_time.ntpTimeString = buf_time_string; 
     myRam.ntp_time.ntpDateString = buf_date_string; 
     myRam.ntp_time.ntpDateTimeString = String(buf_date_string) + " " + String(buf_time_string);  
-    if (millis() - t_update_time_data > 1000)
-    {
-        // Serial.println(myRam.ntp_time.ntpTimeString);
-        // Serial.println(myRam.ntp_time.ntpDateString);
-        // Serial.println(myRam.ntp_time.ntpDateTimeString);
-        t_update_time_data = millis();
-    }
+    delay(1000);
+    // if (millis() - t_update_time_data > 1000)
+    // {
+    //     // Serial.println(myRam.ntp_time.ntpTimeString);
+    //     // Serial.println(myRam.ntp_time.ntpDateString);
+    //     // Serial.println(myRam.ntp_time.ntpDateTimeString);
+    //     t_update_time_data = millis();
+    // }
     // if (myRam.wifi_config_data.is_wifi_connected == 1)
     // {
     // }

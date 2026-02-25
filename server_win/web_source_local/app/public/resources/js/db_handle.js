@@ -35,15 +35,15 @@ function update_new_data_to_database(devNumber, dataJson)
     data = JSON.stringify(data);
     // console.log(`recv from ${devNumber}: ${data}`);
     let change = false;
-    if(prev_dataJson){
-        change = isDuplicated(prev_dataJson, dataJson);
-    }
+    // if(prev_dataJson){
+    //     change = isDuplicated(prev_dataJson, dataJson);
+    // }
     
-    if (change || !prev_dataJson){
-        putRequestHttp(db_url_base, db_enpoint, String(devNumber), data, (response) => {
-            // console.log(response);
-        });
-    }
+    // if (change || !prev_dataJson){
+    // }
+    putRequestHttp(db_url_base, db_enpoint, String(devNumber), data, (response) => {
+        // console.log(response);
+    });
     console.log(change);
     console.log(dataJson);
     prev_dataJson = structuredClone(dataJson);
